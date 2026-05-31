@@ -5,109 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robayed GPT</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="home-screen" id="homeScreen">
-    <header class="home-navbar">
-        <div class="home-logo-zone">
-            <img src="assets/ai-sprite.png" alt="Logo" class="logo">
-            <span>Robayed GPT</span>
-        </div>
-        <div class="home-nav-links">
-            <button class="nav-link-btn" id="openAbout">About</button>
-            
-            <div id="loginFormContainer" style="display: flex; gap: 10px; align-items: center;">
-                <input type="text" id="usernameInput" placeholder="Username" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #333; font-size: 14px;">
-                <input type="password" id="passwordInput" placeholder="Password" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #333; font-size: 14px;">
-                <button class="nav-link-btn" id="loginSubmitBtn">Login</button>
-            </div>
-            
-            <span id="welcomeMessage" style="display: none; color: white; font-weight: bold; font-size: 14px; margin-left: 10px;"></span>
-        </div>
-    </header>
 
-        <main class="home-hero">
-            <div class="hero-badge">Verified System Environment</div>
-            <h1>What can I help with?</h1>
-            <p>Welcome to Robayed GPT. A premium dashboard assistant built to deliver high-performance secure responses. Authentication required to protect resource allocations.</p>
-            <button class="try-btn" id="tryNowBtn">Get Started</button>
-        </main>
-    </div>
-
-    <div class="app-container hidden" id="appWorkspace">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-group">
-                    <img src="assets/ai-sprite.png" alt="Workspace Logo" class="logo">
-                    <h2>Robayed GPT</h2>
-                </div>
-                <button class="toggle-sidebar" id="closeSidebarBtn">✕</button>
+    <div class="home-screen" id="homeScreen">
+        <header class="home-navbar">
+            <div class="home-logo-zone">
+                <img src="assets/ai-sprite.png" alt="Logo" class="logo">
+                <span>Robayed GPT</span>
             </div>
-            
-            <nav class="sidebar-nav">
-                <button class="new-chat-btn" id="backToHome">
-                    <span>🏠 Return to Menu</span>
-                </button>
-                <div class="nav-section-title">Active Threads</div>
-                <div class="nav-item active">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
-                    Current Chat Stream
+            <div class="home-nav-links">
+                <button class="nav-link-btn" id="openAbout">About</button>
+                
+                <div id="loginFormContainer" style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="usernameInput" placeholder="Username" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #333; font-size: 14px;">
+                    <input type="password" id="passwordInput" placeholder="Password" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #333; font-size: 14px;">
+                    <button class="nav-link-btn" id="loginSubmitBtn">Login</button>
                 </div>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="user-profile-card">
-                    <div class="user-avatar">R</div>
-                    <div class="user-info">
-                        <span class="user-name" id="userProfileTag">Not Logged In</span>
-                        <span class="user-status">Verified Account</span>
-                    </div>
-                </div>
+                
+                <span id="welcomeMessage" style="display: none; color: white; font-weight: bold; font-size: 14px; margin-left: 10px;"></span>
             </div>
-        </aside>
+        </header>
 
         <main class="chat-container">
-            <header class="chat-header">
-                <button class="open-sidebar-btn" id="toggleSidebar">☰</button>
-                <div class="model-badge">Robayed GPT-4o Model</div>
-            </header>
-
-            <div class="chat-stream" id="chatStream">
-                <div class="welcome-box">
-                    <img src="assets/ai-sprite.png" alt="Robayed AI" class="welcome-avatar">
-                    <h2>How can I assist you today?</h2>
-                    <p id="workspaceWelcomeText">Authentication required. Please click the GitHub validation gateway option in the landing menu corner layout header before chatting.</p>
+            <div class="chat-messages" id="chatMessages">
                 </div>
-            </div>
-
-            <div class="input-area">
-                <div class="input-wrapper">
-                    <form id="chatForm">
-                        <input type="text" id="userInput" placeholder="Message Robayed GPT..." autocomplete="off" required disabled>
-                        <button type="submit" id="sendBtn" class="send-action-btn" disabled>
-                            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-                        </button>
-                    </form>
-                    <div class="input-disclaimer">Robayed GPT can make mistakes. Standard secure developer allocation cap: 100 requests.</div>
-                </div>
-            </div>
         </main>
-    </div>
 
-    <div class="modal-overlay" id="aboutModal">
-        <div class="modal-box">
-            <h3>About the Platform</h3>
-            <div class="modal-body-text">
-                <p>Robayed GPT operates on an optimized client-side layout running dark premium system tokens.</p>
-                <p>Requests map directly through separate backend node instances to protect application architecture and ensure compliance with security controls.</p>
-            </div>
-            <div class="modal-actions">
-                <button type="button" id="closeAbout" class="btn-secondary">Dismiss</button>
-            </div>
-        </div>
+        <footer class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Please login above to unlock chat..." disabled style="width: 80%; padding: 10px; border-radius: 4px; border: 1px solid #ccc;" />
+            <button id="sendBtn" disabled style="padding: 10px 20px;">Send</button>
+        </footer>
     </div>
 
     <script src="app.js"></script>
