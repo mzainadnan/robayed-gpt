@@ -1,55 +1,76 @@
 // Define the secure live backend link 
 var BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
 
-// Grab existing frontend elements
+// Grab existing frontend chat layout elements
 const chatMessages = document.getElementById('chatMessages');
 const chatInput = document.getElementById('chatInput') || document.querySelector('input[type="text"]:not(#usernameInput)');
 const sendBtn = document.getElementById('sendBtn') || document.querySelector('button:not(.nav-link-btn)');
 
-// Grab our brand new local login elements from the navbar
+// Grab our secure login elements
 const usernameInput = document.getElementById('usernameInput');
 const passwordInput = document.getElementById('passwordInput');
 const loginSubmitBtn = document.getElementById('loginSubmitBtn');
-const loginFormContainer = document.getElementById('loginFormContainer');
+const welcomeGatewayZone = document.getElementById('welcomeGatewayZone');
 const welcomeMessage = document.getElementById('welcomeMessage');
-
-// Set your desired credentials here
-const CORRECT_USERNAME = "zain";
-const CORRECT_PASSWORD = "robayed_gpt";
 
 // Authentication status variables
 let isAuthenticated = false;
 let activeUserId = ""; 
 
-// --- LOGIN INTERACTION LOGIC ---
+// --- SECURE LOGIN INTERACTION LOGIC ---
 if (loginSubmitBtn) {
-    loginSubmitBtn.addEventListener('click', () => {
+    loginSubmitBtn.addEventListener('click', async () => {
         const enteredUser = usernameInput.value.trim();
         const enteredPass = passwordInput.value;
 
-        if (enteredUser === CORRECT_USERNAME && enteredPass === CORRECT_PASSWORD) {
-            isAuthenticated = true;
-            activeUserId = enteredUser; // Set username for backend payload
-            
-            alert("Login successful! Chat unlocked.");
-            
-            // Hide credentials container and show welcome string
-            if (loginFormContainer) loginFormContainer.style.display = 'none';
-            if (welcomeMessage) {
-                welcomeMessage.textContent = `Welcome, ${enteredUser}!`;
-                welcomeMessage.style.display = 'inline';
-            }
+        if (!enteredUser || !enteredPass) {
+            alert("Please enter both username and password.");
+            return;
+        }
 
-            // Unfreeze the main messaging field & button
-            if (chatInput) {
-                chatInput.disabled = false;
-                chatInput.placeholder = "Type your message here...";
+        try {
+            // Send input variables directly to your Render backend API endpoint
+            const response = await fetch(`${BACKEND_SERVER_URL}/api/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: enteredUser, password: enteredPass })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                isAuthenticated = true;
+                activeUserId = enteredUser; // Set user identifier for messaging logs
+                
+                alert("Login successful! Chat unlocked.");
+                
+                // Hides the login panel layout
+                if (welcomeGatewayZone) {
+                    welcomeGatewayZone.style.display = 'none';
+                }
+                
+                // Displays greeting banner
+                if (welcomeMessage) {
+                    welcomeMessage.textContent = `Welcome, ${enteredUser}!`;
+                    welcomeMessage.style.display = 'inline';
+                }
+
+                // Unfreeze text entry element controls
+                if (chatInput) {
+                    chatInput.disabled = false;
+                    chatInput.placeholder = "Type your message here...";
+                }
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.style.background = "#007acc"; 
+                    sendBtn.style.color = "white";
+                }
+            } else {
+                alert(data.message || "Incorrect username or password. Access denied.");
             }
-            if (sendBtn) {
-                sendBtn.disabled = false;
-            }
-        } else {
-            alert("Incorrect username or password. Access denied.");
+        } catch (error) {
+            console.error("Login verification error:", error);
+            alert("Unable to reach the secure authentication backend.");
         }
     });
 }
@@ -61,12 +82,12 @@ function appendMessage(text, sender) {
     msgDiv.classList.add('message', sender);
     msgDiv.textContent = text;
     chatMessages.appendChild(msgDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll update
 }
 
 async function sendMessage() {
     if (!isAuthenticated) {
-        alert("Please login first.");
+        alert("Please login first using the form above.");
         return;
     }
 
@@ -77,7 +98,7 @@ async function sendMessage() {
     chatInput.value = '';
 
     try {
-        // Send message and access identifier payload straight to Render
+        // Post content alongside session parameters to your Node server
         const response = await fetch(`${BACKEND_SERVER_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
