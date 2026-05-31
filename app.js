@@ -14,8 +14,8 @@ const loginFormContainer = document.getElementById('loginFormContainer');
 const welcomeMessage = document.getElementById('welcomeMessage');
 
 // Set your desired credentials here
-const CORRECT_USERNAME = "admin";
-const CORRECT_PASSWORD = "password123";
+const CORRECT_USERNAME = "zain";
+const CORRECT_PASSWORD = "robayed_gpt";
 
 // Authentication status variables
 let isAuthenticated = false;
