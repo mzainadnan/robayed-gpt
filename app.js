@@ -1,4 +1,4 @@
-const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
+const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com/';
 
 // Interface Elements
 const homeScreen = document.getElementById('homeScreen');
@@ -51,7 +51,7 @@ async function sendMessage() {
     chatInput.value = '';
 
     try {
-        const response = await fetch(`${BACKEND_SERVER_URL}/chat`, {
+        const response = await fetch(`${BACKEND_SERVER_URL}chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: messageText })
@@ -59,7 +59,6 @@ async function sendMessage() {
 
         const data = await response.json();
         
-        // Displays either the AI response or the limit block message from the server
         if (data && data.reply) {
             appendMessage(data.reply, 'bot');
         } else if (data && data.message) {
@@ -69,11 +68,12 @@ async function sendMessage() {
         }
     } catch (error) {
         console.error("Transmission error:", error);
-        appendMessage("System offline. Check connection metrics.", 'bot');
+        // User-friendly sleeping server message
+        appendMessage("System offline. Check connection metrics or wait one minute for the server to wake up.", 'bot');
     }
 }
 
-// EVENTS TRIPPERS
+// EVENTS TRIGGERS
 if (sendBtn) sendBtn.addEventListener('click', sendMessage);
 if (chatInput) {
     chatInput.addEventListener('keypress', (e) => {
