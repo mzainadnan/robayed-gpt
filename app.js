@@ -1,4 +1,5 @@
-const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com/';
+// Cleaned up URL structure to prevent internal browser crashes
+const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
 
 // Interface Elements
 const homeScreen = document.getElementById('homeScreen');
@@ -10,12 +11,11 @@ const chatInput = document.getElementById('chatInput');
 
 // SCREEN TRANSITION LOGIC
 if (startChatBtn) {
-    startChatBtn.addEventListener('click', () => {
+    startChatBtn.onclick = function() {
         if (homeScreen) homeScreen.style.display = 'none';
         if (chatDashboardZone) chatDashboardZone.style.display = 'block';
-    });
+    };
 }
-
 // RENDER MESSAGE IN WINDOW
 function appendMessage(text, sender) {
     if (!chatMessages) return;
