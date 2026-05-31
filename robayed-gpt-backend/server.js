@@ -5,9 +5,10 @@ const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 
-// 1. INITIALIZE GEMINI AI CORE WITH YOUR KEY
-// Swap the text between the quotes below with your actual API Key:
+// 1. INITIALIZE GEMINI AI CORE (Pulling securely from Render)
+// This automatically grabs the key you saved in your Environment settings!
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
 // 2. MIDDLEWARE AND SECURITY CONFIGURATIONS
 app.use(cors()); 
 app.use(express.json()); 
@@ -17,7 +18,7 @@ app.set('trust proxy', 1);
 app.get('/', (req, res) => {
     res.json({ 
         status: "online", 
-        message: "Robayed GPT Backend is fully functional with AI integration!" 
+        message: "Robayed GPT Backend is fully functional with secure AI integration!" 
     });
 });
 
