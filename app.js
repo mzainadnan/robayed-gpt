@@ -150,3 +150,10 @@ function appendMessage(text, sender) {
     chatStream.appendChild(row);
     chatStream.scrollTop = chatStream.scrollHeight;
 }
+// Listen for the click on the login button
+if (loginHeaderBtn) {
+    loginHeaderBtn.addEventListener('click', () => {
+        // Redirect directly to your live Render backend authentication route
+        window.location.href = 'https://robayed-gpt-backend.onrender.com/auth/github';
+    });
+}
