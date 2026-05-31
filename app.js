@@ -1,10 +1,10 @@
 // Paste your third-party Supabase credentials here:
 const SUPABASE_URL = 'https://zkqkboyagxxybkncyzbl.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_R07X_l1i89LyDE6eQwXbBA_wzIvoRFn'; // Remember to update this with your publishable key!
+const SUPABASE_ANON_KEY = 'sb_publishable_R07X_l1i89LyDE6eQwXbBA_wzIvoRFn'; // Replace with your real publishable key
 const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
 
-// Initialize Supabase Client
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabase;
+let activeUserEmail = "";
 
 // DOM Containers
 const homeScreen = document.getElementById('homeScreen');
@@ -24,80 +24,85 @@ const welcomeMessage = document.getElementById('welcomeMessage');
 const chatMessages = document.getElementById('chatMessages');
 const chatInput = document.getElementById('chatInput');
 
-let activeUserEmail = "";
-
-// --- CHECK SESSION STATUS AUTOMATICALLY ON LOAD ---
-async function checkActiveSession() {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    
-    if (session && session.user) {
-        activeUserEmail = session.user.email;
-        
-        // Skip right to the workspace if session handles match
-        if (homeScreen) homeScreen.style.display = 'none';
-        if (welcomeGatewayZone) welcomeGatewayZone.style.display = 'none';
-        if (chatDashboardZone) chatDashboardZone.style.display = 'block';
-        
-        if (authenticatedUserZone) authenticatedUserZone.style.display = 'flex';
-        if (welcomeMessage) welcomeMessage.textContent = `User: ${activeUserEmail}`;
+// --- SAFE SETUP LOOP ---
+// This function waits for the entire page and external libraries to load perfectly before doing anything
+window.addEventListener('load', async () => {
+    try {
+        // Double-checks that Supabase actually loaded from the internet first
+        if (window.supabase) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log("Supabase connected successfully.");
+            
+            // Check if someone is already logged in
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session && session.user) {
+                activeUserEmail = session.user.email;
+                if (homeScreen) homeScreen.style.display = 'none';
+                if (welcomeGatewayZone) welcomeGatewayZone.style.display = 'none';
+                if (chatDashboardZone) chatDashboardZone.style.display = 'block';
+                if (authenticatedUserZone) authenticatedUserZone.style.display = 'flex';
+                if (welcomeMessage) welcomeMessage.textContent = `User: ${activeUserEmail}`;
+            }
+        } else {
+            console.error("Supabase script library failed to load from CDN.");
+        }
+    } catch (err) {
+        console.error("Initialization error:", err);
     }
-}
-checkActiveSession();
+});
 
 // --- ROUTING INTERACTORS ---
 if (startChatBtn) {
     startChatBtn.addEventListener('click', () => {
         if (activeUserEmail) {
-            homeScreen.style.display = 'none';
-            chatDashboardZone.style.display = 'block';
+            if (homeScreen) homeScreen.style.display = 'none';
+            if (chatDashboardZone) chatDashboardZone.style.display = 'block';
         } else {
-            homeScreen.style.display = 'none';
-            welcomeGatewayZone.style.display = 'flex';
+            if (homeScreen) homeScreen.style.display = 'none';
+            if (welcomeGatewayZone) welcomeGatewayZone.style.display = 'flex';
         }
     });
 }
 
 if (backToHomeFromAuth) {
     backToHomeFromAuth.addEventListener('click', () => {
-        welcomeGatewayZone.style.display = 'none';
-        homeScreen.style.display = 'flex';
+        if (welcomeGatewayZone) welcomeGatewayZone.style.display = 'none';
+        if (homeScreen) homeScreen.style.display = 'flex';
     });
 }
 
 // --- SECURE OAUTH GITHUB ENGINE ---
 if (githubAuthBtn) {
     githubAuthBtn.addEventListener('click', async () => {
-        // Triggers Supabase to route authentication checks safely out to GitHub
+        if (!supabase) {
+            alert("Database is still loading. Please wait a moment and try again.");
+            return;
+        }
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'github',
             options: {
                 redirectTo: window.location.origin + window.location.pathname
             }
         });
-        
-        if (error) {
-            alert("GitHub Authentication Error: " + error.message);
-        }
+        if (error) alert("GitHub Authentication Error: " + error.message);
     });
 }
 
 // --- LOGOUT ENGINE ---
 if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
-        await supabase.auth.signOut();
+        if (supabase) await supabase.auth.signOut();
         activeUserEmail = "";
-        
         if (authenticatedUserZone) authenticatedUserZone.style.display = 'none';
         if (chatDashboardZone) chatDashboardZone.style.display = 'none';
         if (welcomeGatewayZone) welcomeGatewayZone.style.display = 'none';
         if (homeScreen) homeScreen.style.display = 'flex';
-        
         if (chatInput) chatInput.value = "";
         alert("Logged out successfully.");
     });
 }
 
-// --- STANDARD MESSAGE HANDLING ---
+// --- STANDARD CHAT HANDLERS ---
 function appendMessage(text, sender) {
     if (!chatMessages) return;
     const msgDiv = document.createElement('div');
