@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robayed GPT</title>
     <link rel="stylesheet" href="style.css">
+    
+    <link rel="icon" type="image/png" href="assets/ai-sprite.png">
 </head>
 <body style="margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white;">
 
@@ -84,40 +86,3 @@
         async function sendMessage() {
             const messageText = chatInput.value.trim();
             if (!messageText) return;
-
-            appendMessage(messageText, 'user');
-            chatInput.value = '';
-
-            try {
-                const response = await fetch(`${BACKEND_SERVER_URL}/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: messageText })
-                });
-
-                const data = await response.json();
-                
-                if (data && data.reply) {
-                    appendMessage(data.reply, 'bot');
-                } else if (data && data.message) {
-                    appendMessage(data.message, 'bot');
-                } else {
-                    appendMessage("No response from system context pipelines.", 'bot');
-                }
-            } catch (error) {
-                console.error("Transmission error:", error);
-                appendMessage("System offline. Check connection metrics or wait one minute for the server to wake up.", 'bot');
-            }
-        }
-
-        // EVENT TRIGGERS
-        if (sendBtn) sendBtn.addEventListener('click', sendMessage);
-        if (chatInput) {
-            chatInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') sendMessage();
-            });
-        }
-    </script>
-</body>
-</html>
-<script src="app.js"></script>
