@@ -1,3 +1,10 @@
+// Replace the text inside the quotes with your actual keys from this screen!
+
+const SUPABASE_URL = 'https://zkqkboyagxxybkncyzbl.supabase.co';
+
+const SUPABASE_ANON_KEY = 'sb_publishable_R07X_l1i89LyDE6eQwXbBA_wzIvoRFn';
+
+const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
 // Define the secure live backend link 
 var BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
 
