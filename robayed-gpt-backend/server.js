@@ -1,71 +1,47 @@
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenAI } = require('@google/generative-ai');
 
 const app = express();
 
-// 1. INITIALIZE GEMINI AI CORE (Pulling securely from Render)
-// This automatically grabs the key you saved in your Environment settings!
+// Initialize Gemini Core safely using your Render Environment Variable
+// This uses the correct object instantiation required by the library
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// 2. MIDDLEWARE AND SECURITY CONFIGURATIONS
 app.use(cors()); 
 app.use(express.json()); 
 app.set('trust proxy', 1); 
 
-// 3. ROOT ROUTE
 app.get('/', (req, res) => {
-    res.json({ 
-        status: "online", 
-        message: "Robayed GPT Backend is fully functional with secure AI integration!" 
-    });
+    res.json({ status: "online", message: "AI Engine Ready" });
 });
 
-// 4. 24-HOUR 100-REQUEST LIMITER SETUP
 const chatLimiter = rateLimit({
     windowMs: 24 * 60 * 60 * 1000, 
     max: 100, 
     standardHeaders: true,
     legacyHeaders: false,
-    message: { 
-        reply: "You have reached your limit of 100 requests for today. This limit resets 24 hours after your first message." 
-    },
-    keyGenerator: (req) => {
-        return req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    }
+    keyGenerator: (req) => req.headers['x-forwarded-for'] || req.socket.remoteAddress
 });
 
-// 5. CHAT PIPELINE ENDPOINT (With Live Gemini Processing)
 app.post('/chat', chatLimiter, async (req, res) => {
     const { message } = req.body;
-    
-    if (!message) {
-        return res.json({ reply: "System received an empty message context." });
-    }
-
-    // Capture and log user IP data in your Render console
-    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    console.log(`[CHAT] Request received from IP: ${userIp}`);
+    if (!message) return res.json({ reply: "Empty message received." });
 
     try {
-        // Calling the highly optimized Gemini 1.5 Flash text engine
-        const response = await ai.models.generateContent({
-            model: 'gemini-1.5-flash',
-            contents: message,
-        });
-
-        // Send the real, living AI answer right back to your chat window
-        res.json({ reply: response.text });
-
+        // Target the ultra-fast flash model layout
+        const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const result = await model.generateContent({ contents: message });
+        const response = result.response;
+        
+        // Send the real AI response text back to the frontend
+        res.json({ reply: response.text() });
     } catch (error) {
-        console.error("AI Generation Error:", error);
-        res.json({ reply: "The AI module encountered an internal pipeline error processing that message." });
+        console.error("Gemini Error:", error);
+        res.json({ reply: "The AI module encountered an error processing your request." });
     }
 });
 
-// 6. RUN SYSTEM
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server spinning live on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Live on port ${PORT}`));
