@@ -4,7 +4,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_R07X_l1i89LyDE6eQwXbBA_wzIvoRFn'; // R
 const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
 
 // Initialize Supabase Client
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // DOM Containers
 const homeScreen = document.getElementById('homeScreen');
