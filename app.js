@@ -1,84 +1,99 @@
-// Replace the text inside the quotes with your actual keys from this screen!
-
+// Paste your third-party Supabase credentials here:
 const SUPABASE_URL = 'https://zkqkboyagxxybkncyzbl.supabase.co';
-
-const SUPABASE_ANON_KEY = 'sb_publishable_R07X_l1i89LyDE6eQwXbBA_wzIvoRFn';
-
+const SUPABASE_ANON_KEY = 'sb_publishable_R07X_l1i89LyDE6eQwXbBA_wzIvoRFn'; // Remember to update this with your publishable key!
 const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
-// Define the secure live backend link 
-var BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
 
-// Grab existing frontend chat layout elements
-const chatMessages = document.getElementById('chatMessages');
-const chatInput = document.getElementById('chatInput') || document.querySelector('input[type="text"]:not(#usernameInput)');
-const sendBtn = document.getElementById('sendBtn') || document.querySelector('button:not(.nav-link-btn)');
+// Initialize Supabase Client
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Grab our secure login elements
-const usernameInput = document.getElementById('usernameInput');
-const passwordInput = document.getElementById('passwordInput');
-const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+// DOM Containers
+const homeScreen = document.getElementById('homeScreen');
 const welcomeGatewayZone = document.getElementById('welcomeGatewayZone');
+const chatDashboardZone = document.getElementById('chatDashboardZone');
+
+// Click Elements
+const startChatBtn = document.getElementById('startChatBtn');
+const githubAuthBtn = document.getElementById('githubAuthBtn');
+const backToHomeFromAuth = document.getElementById('backToHomeFromAuth');
+const logoutBtn = document.getElementById('logoutBtn');
+const sendBtn = document.getElementById('sendBtn');
+
+// Display Fields
+const authenticatedUserZone = document.getElementById('authenticatedUserZone');
 const welcomeMessage = document.getElementById('welcomeMessage');
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
 
-// Authentication status variables
-let isAuthenticated = false;
-let activeUserId = ""; 
+let activeUserEmail = "";
 
-// --- SECURE LOGIN INTERACTION LOGIC ---
-if (loginSubmitBtn) {
-    loginSubmitBtn.addEventListener('click', async () => {
-        const enteredUser = usernameInput.value.trim();
-        const enteredPass = passwordInput.value;
+// --- CHECK SESSION STATUS AUTOMATICALLY ON LOAD ---
+async function checkActiveSession() {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (session && session.user) {
+        activeUserEmail = session.user.email;
+        
+        // Skip right to the workspace if session handles match
+        if (homeScreen) homeScreen.style.display = 'none';
+        if (welcomeGatewayZone) welcomeGatewayZone.style.display = 'none';
+        if (chatDashboardZone) chatDashboardZone.style.display = 'block';
+        
+        if (authenticatedUserZone) authenticatedUserZone.style.display = 'flex';
+        if (welcomeMessage) welcomeMessage.textContent = `User: ${activeUserEmail}`;
+    }
+}
+checkActiveSession();
 
-        if (!enteredUser || !enteredPass) {
-            alert("Please enter both username and password.");
-            return;
+// --- ROUTING INTERACTORS ---
+if (startChatBtn) {
+    startChatBtn.addEventListener('click', () => {
+        if (activeUserEmail) {
+            homeScreen.style.display = 'none';
+            chatDashboardZone.style.display = 'block';
+        } else {
+            homeScreen.style.display = 'none';
+            welcomeGatewayZone.style.display = 'flex';
         }
+    });
+}
 
-        try {
-            // Send input variables directly to your Render backend API endpoint
-            const response = await fetch(`${BACKEND_SERVER_URL}/api/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: enteredUser, password: enteredPass })
-            });
+if (backToHomeFromAuth) {
+    backToHomeFromAuth.addEventListener('click', () => {
+        welcomeGatewayZone.style.display = 'none';
+        homeScreen.style.display = 'flex';
+    });
+}
 
-            const data = await response.json();
-
-            if (response.ok && data.success) {
-                isAuthenticated = true;
-                activeUserId = enteredUser; // Set user identifier for messaging logs
-                
-                alert("Login successful! Chat unlocked.");
-                
-                // Hides the login panel layout
-                if (welcomeGatewayZone) {
-                    welcomeGatewayZone.style.display = 'none';
-                }
-                
-                // Displays greeting banner
-                if (welcomeMessage) {
-                    welcomeMessage.textContent = `Welcome, ${enteredUser}!`;
-                    welcomeMessage.style.display = 'inline';
-                }
-
-                // Unfreeze text entry element controls
-                if (chatInput) {
-                    chatInput.disabled = false;
-                    chatInput.placeholder = "Type your message here...";
-                }
-                if (sendBtn) {
-                    sendBtn.disabled = false;
-                    sendBtn.style.background = "#007acc"; 
-                    sendBtn.style.color = "white";
-                }
-            } else {
-                alert(data.message || "Incorrect username or password. Access denied.");
+// --- SECURE OAUTH GITHUB ENGINE ---
+if (githubAuthBtn) {
+    githubAuthBtn.addEventListener('click', async () => {
+        // Triggers Supabase to route authentication checks safely out to GitHub
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'github',
+            options: {
+                redirectTo: window.location.origin + window.location.pathname
             }
-        } catch (error) {
-            console.error("Login verification error:", error);
-            alert("Unable to reach the secure authentication backend.");
+        });
+        
+        if (error) {
+            alert("GitHub Authentication Error: " + error.message);
         }
+    });
+}
+
+// --- LOGOUT ENGINE ---
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        activeUserEmail = "";
+        
+        if (authenticatedUserZone) authenticatedUserZone.style.display = 'none';
+        if (chatDashboardZone) chatDashboardZone.style.display = 'none';
+        if (welcomeGatewayZone) welcomeGatewayZone.style.display = 'none';
+        if (homeScreen) homeScreen.style.display = 'flex';
+        
+        if (chatInput) chatInput.value = "";
+        alert("Logged out successfully.");
     });
 }
 
@@ -86,18 +101,29 @@ if (loginSubmitBtn) {
 function appendMessage(text, sender) {
     if (!chatMessages) return;
     const msgDiv = document.createElement('div');
-    msgDiv.classList.add('message', sender);
+    msgDiv.style.padding = "10px 14px";
+    msgDiv.style.borderRadius = "8px";
+    msgDiv.style.maxWidth = "75%";
+    msgDiv.style.fontSize = "15px";
+    msgDiv.style.lineHeight = "1.5";
+
+    if (sender === 'user') {
+        msgDiv.style.alignSelf = "flex-end";
+        msgDiv.style.background = "#007acc";
+        msgDiv.style.color = "white";
+    } else {
+        msgDiv.style.alignSelf = "flex-start";
+        msgDiv.style.background = "#252525";
+        msgDiv.style.color = "#fff";
+        msgDiv.style.border = "1px solid #333";
+    }
+
     msgDiv.textContent = text;
     chatMessages.appendChild(msgDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll update
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 async function sendMessage() {
-    if (!isAuthenticated) {
-        alert("Please login first using the form above.");
-        return;
-    }
-
     const messageText = chatInput.value.trim();
     if (!messageText) return;
 
@@ -105,14 +131,10 @@ async function sendMessage() {
     chatInput.value = '';
 
     try {
-        // Post content alongside session parameters to your Node server
         const response = await fetch(`${BACKEND_SERVER_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                message: messageText,
-                githubId: activeUserId 
-            })
+            body: JSON.stringify({ message: messageText, githubId: activeUserEmail })
         });
 
         const data = await response.json();
@@ -122,15 +144,12 @@ async function sendMessage() {
             appendMessage("No response from AI.", 'bot');
         }
     } catch (error) {
-        console.error("Error communicating with backend server:", error);
+        console.error("Connection error:", error);
         appendMessage("Error reaching the AI backend server.", 'bot');
     }
 }
 
-// Bind messaging execution triggers
-if (sendBtn) {
-    sendBtn.addEventListener('click', sendMessage);
-}
+if (sendBtn) sendBtn.addEventListener('click', sendMessage);
 if (chatInput) {
     chatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
