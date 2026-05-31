@@ -32,8 +32,8 @@ app.post('/chat', chatLimiter, async (req, res) => {
     if (!message) return res.json({ reply: "Empty message received." });
 
     try {
-        // FIXED: Using the clean, supported stable alias string
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+        // UPDATED: Changed string to the active production model name
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const result = await model.generateContent(message);
         const response = await result.response;
         
