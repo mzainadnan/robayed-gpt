@@ -5,12 +5,10 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
 
-// Fallback to prevent crash if Render environment variable is missing
 if (!process.env.GEMINI_API_KEY) {
     console.error("CRITICAL ERROR: GEMINI_API_KEY environment variable is missing!");
 }
 
-// Correct library initialization matching @google/generative-ai
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "dummy_key");
 
 app.use(cors()); 
@@ -34,7 +32,8 @@ app.post('/chat', chatLimiter, async (req, res) => {
     if (!message) return res.json({ reply: "Empty message received." });
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // FIXED: Prepended 'models/' to match strict library syntax
+        const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
         const result = await model.generateContent(message);
         const response = await result.response;
         
