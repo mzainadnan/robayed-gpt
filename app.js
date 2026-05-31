@@ -1,3 +1,4 @@
+const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
 // Navigation Bindings
 const homeScreen = document.getElementById('homeScreen');
 const appWorkspace = document.getElementById('appWorkspace');
