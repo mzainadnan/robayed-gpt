@@ -1,159 +1,110 @@
-// Navigation Bindings
-const homeScreen = document.getElementById('homeScreen');
-const appWorkspace = document.getElementById('appWorkspace');
-const tryNowBtn = document.getElementById('tryNowBtn');
-const backToHome = document.getElementById('backToHome');
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
-const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+// Define the secure live backend link 
+var BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
 
-// Authentication Selectors
-const loginHeaderBtn = document.getElementById('loginHeaderBtn');
-const userProfileTag = document.getElementById('userProfileTag');
-const workspaceWelcomeText = document.getElementById('workspaceWelcomeText');
+// Grab existing frontend elements
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput') || document.querySelector('input[type="text"]:not(#usernameInput)');
+const sendBtn = document.getElementById('sendBtn') || document.querySelector('button:not(.nav-link-btn)');
 
-// Modals
-const openAbout = document.getElementById('openAbout');
-const closeAbout = document.getElementById('closeAbout');
-const aboutModal = document.getElementById('aboutModal');
+// Grab our brand new local login elements from the navbar
+const usernameInput = document.getElementById('usernameInput');
+const passwordInput = document.getElementById('passwordInput');
+const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+const loginFormContainer = document.getElementById('loginFormContainer');
+const welcomeMessage = document.getElementById('welcomeMessage');
 
-// Input Triggers
-const chatForm = document.getElementById('chatForm');
-const userInput = document.getElementById('userInput');
-const sendBtn = document.getElementById('sendBtn');
-const chatStream = document.getElementById('chatStream');
+// Set your desired credentials here
+const CORRECT_USERNAME = "admin";
+const CORRECT_PASSWORD = "password123";
 
-/* ==========================================
-   CONFIGURED LIVE BACKEND SERVER ENDPOINT
-   ========================================== */
-// Replace with your real live Render server URL!
-const BACKEND_SERVER_URL = "https://robayed-gpt-backend.onrender.com";
+// Authentication status variables
+let isAuthenticated = false;
+let activeUserId = ""; 
 
-const initiateLogin = () => {
-    window.location.href = `${BACKEND_SERVER_URL}/api/auth/login`;
-};
-loginHeaderBtn.addEventListener('click', initiateLogin);
+// --- LOGIN INTERACTION LOGIC ---
+if (loginSubmitBtn) {
+    loginSubmitBtn.addEventListener('click', () => {
+        const enteredUser = usernameInput.value.trim();
+        const enteredPass = passwordInput.value;
 
-/* ==========================================
-   PARSE DISPATCHED SECURITY CALLBACKS
-   ========================================== */
-const urlParams = new URLSearchParams(window.location.search);
-const githubId = urlParams.get('githubId');
-const username = urlParams.get('username');
+        if (enteredUser === CORRECT_USERNAME && enteredPass === CORRECT_PASSWORD) {
+            isAuthenticated = true;
+            activeUserId = enteredUser; // Set username for backend payload
+            
+            alert("Login successful! Chat unlocked.");
+            
+            // Hide credentials container and show welcome string
+            if (loginFormContainer) loginFormContainer.style.display = 'none';
+            if (welcomeMessage) {
+                welcomeMessage.textContent = `Welcome, ${enteredUser}!`;
+                welcomeMessage.style.display = 'inline';
+            }
 
-if (githubId && username) {
-    localStorage.setItem('robayed_github_id', githubId);
-    localStorage.setItem('robayed_username', username);
-    window.history.replaceState({}, document.title, window.location.pathname);
-}
-
-const activeUserId = localStorage.getItem('robayed_github_id');
-const activeUsername = localStorage.getItem('robayed_username');
-
-if (activeUserId && activeUsername) {
-    loginHeaderBtn.textContent = `Sign Out`;
-    loginHeaderBtn.removeEventListener('click', initiateLogin);
-    loginHeaderBtn.addEventListener('click', () => {
-        localStorage.clear();
-        window.location.reload();
+            // Unfreeze the main messaging field & button
+            if (chatInput) {
+                chatInput.disabled = false;
+                chatInput.placeholder = "Type your message here...";
+            }
+            if (sendBtn) {
+                sendBtn.disabled = false;
+            }
+        } else {
+            alert("Incorrect username or password. Access denied.");
+        }
     });
-
-    userProfileTag.textContent = activeUsername;
-    workspaceWelcomeText.textContent = `Hello, ${activeUsername}. Your secure sandbox session is initialized and running.`;
-    userInput.disabled = false;
-    sendBtn.disabled = false;
 }
 
-/* ==========================================
-   VIEW TOGGLE HANDLERS
-   ========================================== */
-tryNowBtn.addEventListener('click', () => {
-    homeScreen.classList.add('hidden');
-    appWorkspace.classList.remove('hidden');
-});
+// --- STANDARD MESSAGE HANDLING ---
+function appendMessage(text, sender) {
+    if (!chatMessages) return;
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', sender);
+    msgDiv.textContent = text;
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
 
-backToHome.addEventListener('click', () => {
-    appWorkspace.classList.add('hidden');
-    homeScreen.classList.remove('hidden');
-});
+async function sendMessage() {
+    if (!isAuthenticated) {
+        alert("Please login first.");
+        return;
+    }
 
-toggleSidebar.addEventListener('click', () => sidebar.classList.add('active'));
-closeSidebarBtn.addEventListener('click', () => sidebar.classList.remove('active'));
-openAbout.addEventListener('click', () => aboutModal.classList.add('active'));
-closeAbout.addEventListener('click', () => aboutModal.classList.remove('active'));
-
-/* ==========================================
-   AUTHENTICATED RUNTIME ROUTER PIPELINE
-   ========================================== */
-chatForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const messageText = userInput.value.trim();
-    if (!messageText || !activeUserId) return;
-
-    const welcomeBox = document.querySelector('.welcome-box');
-    if (welcomeBox) welcomeBox.remove();
+    const messageText = chatInput.value.trim();
+    if (!messageText) return;
 
     appendMessage(messageText, 'user');
-    userInput.value = '';
-
-    // Create the loading thinking indicator row
-    const spriteAsset = document.createElement('img');
-    spriteAsset.src = 'assets/ai-sprite.png';
-    spriteAsset.className = 'ai-sprite-thinking';
-    chatStream.appendChild(spriteAsset);
-    chatStream.scrollTop = chatStream.scrollHeight;
+    chatInput.value = '';
 
     try {
-        const response = await fetch(`${BACKEND_SERVER_URL}/api/chat`, {
+        // Send message and access identifier payload straight to Render
+        const response = await fetch(`${BACKEND_SERVER_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 message: messageText,
-                githubId: activeUserId
+                githubId: activeUserId 
             })
         });
 
         const data = await response.json();
-        spriteAsset.remove();
-
-        if (!response.ok) {
-            appendMessage(data.error || 'Server processing fault.', 'ai');
-            return;
+        if (data && data.reply) {
+            appendMessage(data.reply, 'bot');
+        } else {
+            appendMessage("No response from AI.", 'bot');
         }
-
-        appendMessage(data.text, 'ai');
-
     } catch (error) {
-        spriteAsset.remove();
-        appendMessage(`Connection Failure: Could not establish secure link to server core modules.`, 'ai');
+        console.error("Error communicating with backend server:", error);
+        appendMessage("Error reaching the AI backend server.", 'bot');
     }
-});
-
-function appendMessage(text, sender) {
-    const row = document.createElement('div');
-    row.className = `message-row ${sender}-row`;
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'message-content-wrapper';
-    
-    const avatarImg = document.createElement('img');
-    avatarImg.className = 'msg-avatar';
-    avatarImg.src = sender === 'user' ? 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><rect width="30" height="30" fill="%23543d96"/><text x="50%" y="55%" dom-dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="12">U</text></svg>' : 'assets/ai-sprite.png';
-
-    const textBox = document.createElement('div');
-    textBox.className = 'msg-text-box';
-    textBox.textContent = text;
-
-    wrapper.appendChild(avatarImg);
-    wrapper.appendChild(textBox);
-    row.appendChild(wrapper);
-    chatStream.appendChild(row);
-    chatStream.scrollTop = chatStream.scrollHeight;
 }
-// Listen for the click on the login button
-if (loginHeaderBtn) {
-    loginHeaderBtn.addEventListener('click', () => {
-        // Redirect directly to your live Render backend authentication route
-        window.location.href = 'https://robayed-gpt-backend.onrender.com/auth/github';
+
+// Bind messaging execution triggers
+if (sendBtn) {
+    sendBtn.addEventListener('click', sendMessage);
+}
+if (chatInput) {
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
     });
 }
