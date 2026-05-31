@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robayed GPT</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="home-screen" id="homeScreen">
+        <header class="home-navbar">
+            <div class="home-logo-zone">
+                <img src="assets/ai-sprite.png" alt="Logo" class="logo">
+                <span>Robayed GPT</span>
+            </div>
+            <div class="home-nav-links">
+                <button class="nav-link-btn" id="openAbout">About</button>
+                <button class="github-login-btn" id="loginHeaderBtn">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.1.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.6 1.03 2.69 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+                    Sign In with GitHub
+                </button>
+            </div>
+        </header>
+
+        <main class="home-hero">
+            <div class="hero-badge">Verified System Environment</div>
+            <h1>What can I help with?</h1>
+            <p>Welcome to Robayed GPT. A premium dashboard assistant built to deliver high-performance secure responses. Authentication required to protect resource allocations.</p>
+            <button class="try-btn" id="tryNowBtn">Get Started</button>
+        </main>
+    </div>
+
+    <div class="app-container hidden" id="appWorkspace">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-group">
+                    <img src="assets/ai-sprite.png" alt="Workspace Logo" class="logo">
+                    <h2>Robayed GPT</h2>
+                </div>
+                <button class="toggle-sidebar" id="closeSidebarBtn">✕</button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="new-chat-btn" id="backToHome">
+                    <span>🏠 Return to Menu</span>
+                </button>
+                <div class="nav-section-title">Active Threads</div>
+                <div class="nav-item active">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+                    Current Chat Stream
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-card">
+                    <div class="user-avatar">R</div>
+                    <div class="user-info">
+                        <span class="user-name" id="userProfileTag">Not Logged In</span>
+                        <span class="user-status">Verified Account</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="chat-container">
+            <header class="chat-header">
+                <button class="open-sidebar-btn" id="toggleSidebar">☰</button>
+                <div class="model-badge">Robayed GPT-4o Model</div>
+            </header>
+
+            <div class="chat-stream" id="chatStream">
+                <div class="welcome-box">
+                    <img src="assets/ai-sprite.png" alt="Robayed AI" class="welcome-avatar">
+                    <h2>How can I assist you today?</h2>
+                    <p id="workspaceWelcomeText">Authentication required. Please click the GitHub validation gateway option in the landing menu corner layout header before chatting.</p>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <form id="chatForm">
+                        <input type="text" id="userInput" placeholder="Message Robayed GPT..." autocomplete="off" required disabled>
+                        <button type="submit" id="sendBtn" class="send-action-btn" disabled>
+                            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                        </button>
+                    </form>
+                    <div class="input-disclaimer">Robayed GPT can make mistakes. Standard secure developer allocation cap: 100 requests.</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="aboutModal">
+        <div class="modal-box">
+            <h3>About the Platform</h3>
+            <div class="modal-body-text">
+                <p>Robayed GPT operates on an optimized client-side layout running dark premium system tokens.</p>
+                <p>Requests map directly through separate backend node instances to protect application architecture and ensure compliance with security controls.</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="closeAbout" class="btn-secondary">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
