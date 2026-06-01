@@ -53,16 +53,16 @@
             padding: 14px 22px 10px 26px;
         }
 
-        /* Small Copy Action Trigger Button */
+        /* Ultra-Mini Copy Action Trigger Button */
         .pixel-copy-btn {
             font-family: 'Press Start 2P', monospace;
-            font-size: 8px;
+            font-size: 6px; /* Made smaller */
             background: #4a4a4a;
             color: #fff;
             border: 2px solid #000;
             cursor: pointer;
-            padding: 4px 6px;
-            margin-top: 8px;
+            padding: 2px 4px; /* Tightened padding */
+            margin-top: 5px;  /* Reduced margin spacing */
             display: inline-block;
             text-transform: uppercase;
         }
@@ -93,14 +93,14 @@
             border: 2px solid #000;
         }
 
-        /* Retro Thinking Animation: Shifts perfectly by 1 pixel */
+        /* Slower 5px Retro Thinking Animation */
         @keyframes pixelBounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-2px); }
+            50% { transform: translateY(-5px); } /* Higher shift */
         }
 
         .thinking-sprite {
-            animation: pixelBounce 0.4s steps(2) infinite;
+            animation: pixelBounce 0.8s steps(2) infinite; /* Slowed down to 0.8s */
         }
     </style>
 </head>
@@ -143,17 +143,14 @@
             const chatMessages = document.getElementById('chatMessages');
             const chatInput = document.getElementById('chatInput');
 
-            // Helper function to clean markdown formatting symbols like *
             function cleanMarkdown(text) {
                 if (!text) return "";
-                // Removes individual standalone or grouped asterisk formatting marks completely
                 return text.replace(/\*/g, '');
             }
 
             function appendMessage(rawText, sender) {
                 if (!chatMessages) return null;
 
-                // Strip star formatting out of the raw response text string
                 const text = cleanMarkdown(rawText);
 
                 const wrapperDiv = document.createElement('div');
@@ -162,7 +159,6 @@
                 wrapperDiv.style.alignItems = "flex-start";
                 wrapperDiv.style.maxWidth = "85%";
 
-                // Main vertical block container for the bubble and its inner tools
                 const blockContainer = document.createElement('div');
                 blockContainer.style.display = "flex";
                 blockContainer.style.flexDirection = "column";
@@ -215,7 +211,6 @@
                     
                     blockContainer.appendChild(msgDiv);
 
-                    // Append interactive copy tool only for active system replies
                     if (sender === 'ai') {
                         const copyBtn = document.createElement('button');
                         copyBtn.className = 'pixel-copy-btn';
