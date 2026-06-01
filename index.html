@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robayed GPT</title>
     
+    <link rel="shortcut icon" type="image/png" href="assets/ai-sprite.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/ai-sprite.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/ai-sprite.png">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Press+Start+2P&display=swap');
 
@@ -56,13 +60,13 @@
         /* Ultra-Mini Copy Action Trigger Button */
         .pixel-copy-btn {
             font-family: 'Press Start 2P', monospace;
-            font-size: 6px; /* Made smaller */
+            font-size: 6px; 
             background: #4a4a4a;
             color: #fff;
             border: 2px solid #000;
             cursor: pointer;
-            padding: 2px 4px; /* Tightened padding */
-            margin-top: 5px;  /* Reduced margin spacing */
+            padding: 2px 4px; 
+            margin-top: 5px;  
             display: inline-block;
             text-transform: uppercase;
         }
@@ -96,11 +100,11 @@
         /* Slower 5px Retro Thinking Animation */
         @keyframes pixelBounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); } /* Higher shift */
+            50% { transform: translateY(-5px); } 
         }
 
         .thinking-sprite {
-            animation: pixelBounce 0.8s steps(2) infinite; /* Slowed down to 0.8s */
+            animation: pixelBounce 0.8s steps(2) infinite; 
         }
     </style>
 </head>
@@ -143,6 +147,7 @@
             const chatMessages = document.getElementById('chatMessages');
             const chatInput = document.getElementById('chatInput');
 
+            // Correct simple Markdown cleanup helper
             function cleanMarkdown(text) {
                 if (!text) return "";
                 return text.replace(/\*/g, '');
@@ -217,69 +222,4 @@
                         copyBtn.textContent = '[Copy]';
                         copyBtn.onclick = function() {
                             navigator.clipboard.writeText(text).then(() => {
-                                copyBtn.textContent = '[Copied!]';
-                                setTimeout(() => {
-                                    copyBtn.textContent = '[Copy]';
-                                }, 1500);
-                            }).catch(err => {
-                                console.error('Copy function failed:', err);
-                            });
-                        };
-                        blockContainer.appendChild(copyBtn);
-                    }
-
-                    wrapperDiv.appendChild(blockContainer);
-                }
-
-                chatMessages.appendChild(wrapperDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                return wrapperDiv;
-            }
-
-            async function sendMessage() {
-                const messageText = chatInput.value.trim();
-                if (!messageText) return;
-                
-                appendMessage(messageText, 'user');
-                chatInput.value = '';
-
-                const thinkingBubble = appendMessage(". . .", 'thinking');
-
-                try {
-                    const response = await fetch(`${BACKEND_SERVER_URL}/chat`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: messageText })
-                    });
-
-                    if (thinkingBubble) thinkingBubble.remove();
-
-                    if (!response.ok) throw new Error(`Status: ${response.status}`);
-                    const data = await response.json();
-                    
-                    const responseText = data.reply || data.response || "No response data returned.";
-                    appendMessage(responseText, 'ai');
-                } catch (error) {
-                    console.error(error);
-                    if (thinkingBubble) thinkingBubble.remove();
-                    appendMessage("[SYSTEM ERROR: PIPELINE CONNECTION REFUSED]", 'ai');
-                }
-            }
-
-            if (sendBtn) sendBtn.onclick = sendMessage;
-            if (chatInput) {
-                chatInput.onkeypress = function(e) {
-                    if (e.key === 'Enter') sendMessage();
-                };
-            }
-        }
-
-        if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", initChatEngine);
-        } else {
-            initChatEngine();
-        }
-    </script>
-</body>
-</html>
+                                copy
