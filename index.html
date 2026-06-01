@@ -6,58 +6,113 @@
     <title>Robayed GPT</title>
     
     <style>
-        /* Base scrollbar styling for the chat container */
+        /* Import a retro-style pixel font */
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Press+Start+2P&display=swap');
+
+        * {
+            box-sizing: border-box;
+            /* Keeps pixel images crisp and un-blurred when scaling */
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Courier Prime', monospace;
+            background-color: #1a1a1a;
+            color: #dbdbdb;
+        }
+
+        /* Standardized Retro Borders */
+        .pixel-border {
+            border: 4px solid #000000;
+            box-shadow: 
+                inset -4px -4px 0px 0px #4a4a4a,
+                inset 4px 4px 0px 0px #ffffff;
+        }
+
+        .pixel-border-inset {
+            border: 4px solid #000000;
+            box-shadow: 
+                inset -4px -4px 0px 0px #ffffff,
+                inset 4px 4px 0px 0px #4a4a4a;
+            background-color: #262626;
+        }
+
+        /* Retro Arcade Buttons */
+        .pixel-btn {
+            display: inline-block;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 14px;
+            color: #ffffff;
+            background-color: #4a4a4a;
+            border: 4px solid #000000;
+            box-shadow: 
+                inset -4px -4px 0px 0px #262626,
+                inset 4px 4px 0px 0px #8b8b8b;
+            padding: 12px 24px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .pixel-btn:active {
+            box-shadow: 
+                inset 4px 4px 0px 0px #262626,
+                inset -4px -4px 0px 0px #8b8b8b;
+            padding: 14px 22px 10px 26px;
+        }
+
+        /* Chat scrollbar pixel style */
         #chatMessages::-webkit-scrollbar {
-            width: 6px;
+            width: 12px;
+        }
+        #chatMessages::-webkit-scrollbar-track {
+            background: #262626;
+            border-left: 4px solid #000;
         }
         #chatMessages::-webkit-scrollbar-thumb {
-            background-color: #2d2d2d;
-            border-radius: 3px;
-        }
-        button:active {
-            transform: scale(0.98);
+            background: #4a4a4a;
+            border: 2px solid #000;
         }
     </style>
     
     <link rel="icon" type="image/png" href="assets/ai-sprite.png">
 </head>
-<body style="margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white;">
+<body>
 
-    <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #1a1a1a; border-bottom: 1px solid #2d2d2d;">
-        <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 20px;">
-            <img src="assets/ai-sprite.png" alt="AI Icon" style="width: 24px; height: 24px; object-fit: contain;">
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #262626; border-bottom: 4px solid #000000;">
+        <div style="display: flex; align-items: center; gap: 12px; font-family: 'Press Start 2P', monospace; font-size: 14px; color: #fff;">
+            <img src="assets/ai-sprite.png" alt="AI" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.style.backgroundColor='#fff'">
             Robayed GPT
         </div>
     </header>
 
-    <div id="homeScreen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 80vh; padding: 20px; box-sizing: border-box;">
-        <h1 style="font-size: 48px; margin-bottom: 20px; font-weight: 800; letter-spacing: -1px;">The Next Generation AI Workspace</h1>
-        <p style="font-size: 18px; color: #aaa; max-width: 600px; margin-bottom: 40px; line-height: 1.6;">Access advanced pipeline mechanics, interactive modules, and customized AI computing interfaces.</p>
-        <button id="startChatBtn" style="background: #007acc; color: white; border: none; padding: 16px 36px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 14px rgba(0,122,204,0.4); transition: transform 0.1s ease;">Start Chatting →</button>
+    <div id="homeScreen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 80vh; padding: 20px;">
+        <h1 style="font-family: 'Press Start 2P', monospace; font-size: 28px; line-height: 1.5; margin-bottom: 24px; color: #ffffff; max-width: 700px;">The Next Gen AI Workspace</h1>
+        <p style="font-size: 18px; color: #8b8b8b; max-width: 600px; margin-bottom: 40px; line-height: 1.6; font-weight: bold;">Access advanced pipeline mechanics, interactive modules, and customized AI computing interfaces.</p>
+        <button id="startChatBtn" class="pixel-btn">Start Chatting</button>
     </div>
 
-    <div id="chatDashboardZone" style="display: none; max-width: 800px; margin: 30px auto; padding: 20px; box-sizing: border-box;">
-        <main style="background: #1a1a1a; border: 1px solid #2d2d2d; border-radius: 12px; height: 55vh; display: flex; flex-direction: column;">
-            <div id="chatMessages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;">
-                <div style="background: rgba(0,122,204,0.1); border: 1px solid rgba(0,122,204,0.2); padding: 12px; border-radius: 8px; color: #007acc; font-size: 14px; text-align: center; flex-shrink: 0;">
-                    AI Session Initialized. Free Access Active.
+    <div id="chatDashboardZone" style="display: none; max-width: 800px; margin: 30px auto; padding: 20px;">
+        <main class="pixel-border-inset" style="height: 50vh; display: flex; flex-direction: column;">
+            <div id="chatMessages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
+                <div style="border: 2px dashed #4a4a4a; padding: 12px; color: #8b8b8b; font-size: 14px; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 10px;">
+                    [ AI SYSTEM INITIALIZED ]
                 </div>
             </div>
         </main>
 
-        <footer style="margin-top: 20px; display: flex; gap: 12px;">
-            <input type="text" id="chatInput" placeholder="Type your message here..." style="flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 15px; outline: none;" />
-            <button id="sendBtn" style="padding: 0 30px; border-radius: 8px; background: #007acc; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 15px; transition: transform 0.1s ease;">Send</button>
+        <footer style="margin-top: 24px; display: flex; gap: 12px; align-items: stretch;">
+            <input type="text" id="chatInput" class="pixel-border-inset" placeholder="Type your message here..." style="flex: 1; padding: 16px; color: #fff; font-size: 16px; font-family: 'Courier Prime', monospace; outline: none;" />
+            <button id="sendBtn" class="pixel-btn" style="font-size: 12px;">Send</button>
         </footer>
     </div>
 
     <script>
         const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
 
-        // Guarantees all HTML elements load safely before executing scripts
-        document.addEventListener("DOMContentLoaded", function() {
-            
-            // UI Element References
+        // Instant execution handler to prevent browser freeze hooks
+        function initApp() {
             const homeScreen = document.getElementById('homeScreen');
             const chatDashboardZone = document.getElementById('chatDashboardZone');
             const startChatBtn = document.getElementById('startChatBtn');
@@ -65,54 +120,52 @@
             const chatMessages = document.getElementById('chatMessages');
             const chatInput = document.getElementById('chatInput');
 
-            // Screen Transition Routing
+            // Force button action regardless of asset load states
             if (startChatBtn) {
-                startChatBtn.addEventListener('click', function() {
+                startChatBtn.onclick = function() {
                     if (homeScreen) homeScreen.style.display = 'none';
                     if (chatDashboardZone) chatDashboardZone.style.display = 'block';
-                });
+                };
             }
 
-            // Message Element Constructor
             function appendMessage(text, sender) {
                 if (!chatMessages) return;
 
-                // Create flex container row for structural layout
                 const wrapperDiv = document.createElement('div');
                 wrapperDiv.style.display = "flex";
-                wrapperDiv.style.gap = "10px";
+                wrapperDiv.style.gap = "12px";
                 wrapperDiv.style.alignItems = "flex-start";
-                wrapperDiv.style.maxWidth = "75%";
+                wrapperDiv.style.maxWidth = "85%";
 
-                // Message text container bubble
                 const msgDiv = document.createElement('div');
-                msgDiv.style.padding = "10px 14px";
-                msgDiv.style.borderRadius = "8px";
-                msgDiv.style.fontSize = "15px";
-                msgDiv.style.lineHeight = "1.5";
+                msgDiv.style.padding = "12px 16px";
+                msgDiv.style.fontSize = "16px";
+                msgDiv.style.lineHeight = "1.4";
+                msgDiv.style.border = "4px solid #000000";
 
                 if (sender === 'user') {
                     wrapperDiv.style.alignSelf = "flex-end";
-                    msgDiv.style.background = "#007acc";
-                    msgDiv.style.color = "white";
+                    msgDiv.style.background = "#4a4a4a";
+                    msgDiv.style.color = "#ffffff";
+                    msgDiv.style.boxShadow = "inset -3px -3px 0px 0px #262626";
                     wrapperDiv.appendChild(msgDiv);
                 } else {
                     wrapperDiv.style.alignSelf = "flex-start";
-                    msgDiv.style.background = "#252525";
-                    msgDiv.style.color = "#fff";
-                    msgDiv.style.border = "1px solid #333";
+                    msgDiv.style.background = "#333333";
+                    msgDiv.style.color = "#dbdbdb";
+                    msgDiv.style.boxShadow = "inset -3px -3px 0px 0px #1a1a1a";
 
-                    // Side-by-side Avatar configuration 
                     const avatarImg = document.createElement('img');
                     avatarImg.src = "assets/ai-sprite.png";
                     avatarImg.alt = "AI";
-                    avatarImg.style.width = "28px";
-                    avatarImg.style.height = "28px";
+                    // Fallback block background if image is missing
+                    avatarImg.onerror = function() { this.style.backgroundColor = '#8b8b8b'; };
+                    avatarImg.style.width = "32px";
+                    avatarImg.style.height = "32px";
                     avatarImg.style.objectFit = "contain";
-                    avatarImg.style.borderRadius = "50%";
                     avatarImg.style.flexShrink = "0";
+                    avatarImg.style.border = "2px solid #000";
 
-                    // Append sprite image first, text window next to it
                     wrapperDiv.appendChild(avatarImg);
                     wrapperDiv.appendChild(msgDiv);
                 }
@@ -122,52 +175,43 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
-            // Live API Communication Sequence
             async function sendMessage() {
                 const messageText = chatInput.value.trim();
                 if (!messageText) return;
                 
-                // Display user box instantly
                 appendMessage(messageText, 'user');
                 chatInput.value = '';
 
                 try {
-                    // Send message array to Render Node/Python server
-                    // Assumes a processing endpoint setup at /chat
                     const response = await fetch(`${BACKEND_SERVER_URL}/chat`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ message: messageText })
                     });
 
-                    if (!response.ok) {
-                        throw new Error(`Server status returned error code: ${response.status}`);
-                    }
-
+                    if (!response.ok) throw new Error(`Status: ${response.status}`);
                     const data = await response.json();
-                    
-                    // Maps backend text variants dynamically
-                    const aiReply = data.reply || data.response || "No structured text content returned from the pipeline server.";
-                    appendMessage(aiReply, 'ai');
-
+                    appendMessage(data.reply || data.response || "No response received.", 'ai');
                 } catch (error) {
-                    console.error("Pipeline breakdown:", error);
-                    appendMessage("System Error: Connection to backend node refused. Please check server logs.", 'ai');
+                    console.error(error);
+                    appendMessage("[ERROR: PIPELINE OFFLINE]", 'ai');
                 }
             }
 
-            // Bind Interface Listeners
-            if (sendBtn) {
-                sendBtn.addEventListener('click', sendMessage);
-            }
+            if (sendBtn) sendBtn.onclick = sendMessage;
             if (chatInput) {
-                chatInput.addEventListener('keypress', function(e) {
+                chatInput.onkeypress = function(e) {
                     if (e.key === 'Enter') sendMessage();
-                });
+                };
             }
-        });
+        }
+
+        // Dual-execution setup to guarantee performance regardless of execution environment
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initApp);
+        } else {
+            initApp();
+        }
     </script>
 </body>
 </html>
