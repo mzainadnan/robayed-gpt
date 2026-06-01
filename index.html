@@ -80,7 +80,6 @@
                 msgDiv.style.background = "#007acc";
                 msgDiv.style.color = "white";
                 
-                // Just add the bubble for the user
                 wrapperDiv.appendChild(msgDiv);
             } else {
                 wrapperDiv.style.alignSelf = "flex-start";
@@ -88,7 +87,7 @@
                 msgDiv.style.color = "#fff";
                 msgDiv.style.border = "1px solid #333";
 
-                // Create AI avatar image element
+                // AI avatar image element
                 const avatarImg = document.createElement('img');
                 avatarImg.src = "assets/ai-sprite.png";
                 avatarImg.alt = "AI";
@@ -98,7 +97,6 @@
                 avatarImg.style.borderRadius = "50%";
                 avatarImg.style.flexShrink = "0";
 
-                // Append avatar first, then the message box next to it
                 wrapperDiv.appendChild(avatarImg);
                 wrapperDiv.appendChild(msgDiv);
             }
@@ -116,12 +114,13 @@
             appendMessage(messageText, 'user');
             chatInput.value = '';
 
-            // Simulated AI Response testing logic (Replace with your direct Render API call)
+            // Simulated response logic for verification
             setTimeout(() => {
                 appendMessage("This is a response showing the new layout with the asset icon next to it!", 'ai');
             }, 750);
         }
 
+        // Event Listeners for sending messages
         if (sendBtn) {
             sendBtn.addEventListener('click', sendMessage);
         }
