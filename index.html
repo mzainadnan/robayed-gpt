@@ -6,12 +6,10 @@
     <title>Robayed GPT</title>
     
     <style>
-        /* Import a retro-style pixel font */
-        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Press+Start+2P&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Press+Start+2P&display=swap');
 
         * {
             box-sizing: border-box;
-            /* Keeps pixel images crisp and un-blurred when scaling */
             image-rendering: pixelated;
             image-rendering: crisp-edges;
         }
@@ -23,14 +21,7 @@
             color: #dbdbdb;
         }
 
-        /* Standardized Retro Borders */
-        .pixel-border {
-            border: 4px solid #000000;
-            box-shadow: 
-                inset -4px -4px 0px 0px #4a4a4a,
-                inset 4px 4px 0px 0px #ffffff;
-        }
-
+        /* Retro Bevel Borders */
         .pixel-border-inset {
             border: 4px solid #000000;
             box-shadow: 
@@ -39,17 +30,17 @@
             background-color: #262626;
         }
 
-        /* Retro Arcade Buttons */
+        /* High-Contrast Theme Arcade Button */
         .pixel-btn {
             display: inline-block;
             font-family: 'Press Start 2P', monospace;
             font-size: 14px;
             color: #ffffff;
-            background-color: #4a4a4a;
+            background-color: #5a5a5a;
             border: 4px solid #000000;
             box-shadow: 
-                inset -4px -4px 0px 0px #262626,
-                inset 4px 4px 0px 0px #8b8b8b;
+                inset -4px -4px 0px 0px #333333,
+                inset 4px 4px 0px 0px #a6a6a6;
             padding: 12px 24px;
             cursor: pointer;
             text-transform: uppercase;
@@ -57,12 +48,21 @@
 
         .pixel-btn:active {
             box-shadow: 
-                inset 4px 4px 0px 0px #262626,
-                inset -4px -4px 0px 0px #8b8b8b;
+                inset 4px 4px 0px 0px #333333,
+                inset -4px -4px 0px 0px #a6a6a6;
             padding: 14px 22px 10px 26px;
         }
 
-        /* Chat scrollbar pixel style */
+        /* CSS Rendered Theme Placeholder Icon (Matches pixel theme if image fails) */
+        .theme-pixel-icon {
+            width: 24px;
+            height: 24px;
+            background: #8b8b8b;
+            border: 2px solid #fff;
+            box-shadow: 2px 2px 0px #000;
+            display: inline-block;
+        }
+
         #chatMessages::-webkit-scrollbar {
             width: 12px;
         }
@@ -75,28 +75,28 @@
             border: 2px solid #000;
         }
     </style>
-    
-    <link rel="icon" type="image/png" href="assets/ai-sprite.png">
 </head>
 <body>
 
     <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #262626; border-bottom: 4px solid #000000;">
         <div style="display: flex; align-items: center; gap: 12px; font-family: 'Press Start 2P', monospace; font-size: 14px; color: #fff;">
-            <img src="assets/ai-sprite.png" alt="AI" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.style.backgroundColor='#fff'">
+            <img src="assets/ai-sprite.png" alt="" style="width: 24px; height: 24px; object-fit: contain; display: block;" onerror="this.style.display='none'; document.getElementById('fallback-icon').style.display='inline-block';">
+            <div id="fallback-icon" class="theme-pixel-icon" style="display: none;"></div>
             Robayed GPT
         </div>
     </header>
 
     <div id="homeScreen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 80vh; padding: 20px;">
-        <h1 style="font-family: 'Press Start 2P', monospace; font-size: 28px; line-height: 1.5; margin-bottom: 24px; color: #ffffff; max-width: 700px;">The Next Gen AI Workspace</h1>
+        <h1 style="font-family: 'Press Start 2P', monospace; font-size: 26px; line-height: 1.6; margin-bottom: 24px; color: #ffffff; max-width: 700px;">The Next Gen AI Workspace</h1>
         <p style="font-size: 18px; color: #8b8b8b; max-width: 600px; margin-bottom: 40px; line-height: 1.6; font-weight: bold;">Access advanced pipeline mechanics, interactive modules, and customized AI computing interfaces.</p>
-        <button id="startChatBtn" class="pixel-btn">Start Chatting</button>
+        
+        <button id="startChatBtn" class="pixel-btn" onclick="document.getElementById('homeScreen').style.display='none'; document.getElementById('chatDashboardZone').style.display='block';">Start Chatting</button>
     </div>
 
     <div id="chatDashboardZone" style="display: none; max-width: 800px; margin: 30px auto; padding: 20px;">
         <main class="pixel-border-inset" style="height: 50vh; display: flex; flex-direction: column;">
             <div id="chatMessages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
-                <div style="border: 2px dashed #4a4a4a; padding: 12px; color: #8b8b8b; font-size: 14px; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 10px;">
+                <div style="border: 2px dashed #4a4a4a; padding: 12px; color: #8b8b8b; font-family: 'Press Start 2P', monospace; font-size: 10px; text-align: center;">
                     [ AI SYSTEM INITIALIZED ]
                 </div>
             </div>
@@ -111,22 +111,10 @@
     <script>
         const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
 
-        // Instant execution handler to prevent browser freeze hooks
-        function initApp() {
-            const homeScreen = document.getElementById('homeScreen');
-            const chatDashboardZone = document.getElementById('chatDashboardZone');
-            const startChatBtn = document.getElementById('startChatBtn');
+        function initChatEngine() {
             const sendBtn = document.getElementById('sendBtn');
             const chatMessages = document.getElementById('chatMessages');
             const chatInput = document.getElementById('chatInput');
-
-            // Force button action regardless of asset load states
-            if (startChatBtn) {
-                startChatBtn.onclick = function() {
-                    if (homeScreen) homeScreen.style.display = 'none';
-                    if (chatDashboardZone) chatDashboardZone.style.display = 'block';
-                };
-            }
 
             function appendMessage(text, sender) {
                 if (!chatMessages) return;
@@ -145,28 +133,39 @@
 
                 if (sender === 'user') {
                     wrapperDiv.style.alignSelf = "flex-end";
-                    msgDiv.style.background = "#4a4a4a";
+                    msgDiv.style.background = "#5a5a5a";
                     msgDiv.style.color = "#ffffff";
-                    msgDiv.style.boxShadow = "inset -3px -3px 0px 0px #262626";
+                    msgDiv.style.boxShadow = "inset -3px -3px 0px 0px #333333";
                     wrapperDiv.appendChild(msgDiv);
                 } else {
                     wrapperDiv.style.alignSelf = "flex-start";
-                    msgDiv.style.background = "#333333";
+                    msgDiv.style.background = "#2b2b2b";
                     msgDiv.style.color = "#dbdbdb";
-                    msgDiv.style.boxShadow = "inset -3px -3px 0px 0px #1a1a1a";
+                    msgDiv.style.boxShadow = "inset -3px -3px 0px 0px #111111";
+
+                    // Side Avatar Layout Config
+                    const avatarContainer = document.createElement('div');
+                    avatarContainer.style.width = "32px";
+                    avatarContainer.style.height = "32px";
+                    avatarContainer.style.flexShrink = "0";
 
                     const avatarImg = document.createElement('img');
                     avatarImg.src = "assets/ai-sprite.png";
-                    avatarImg.alt = "AI";
-                    // Fallback block background if image is missing
-                    avatarImg.onerror = function() { this.style.backgroundColor = '#8b8b8b'; };
-                    avatarImg.style.width = "32px";
-                    avatarImg.style.height = "32px";
+                    avatarImg.alt = "";
+                    avatarImg.style.width = "100%";
+                    avatarImg.style.height = "100%";
                     avatarImg.style.objectFit = "contain";
-                    avatarImg.style.flexShrink = "0";
-                    avatarImg.style.border = "2px solid #000";
+                    
+                    // Uses a themed gray block if image path is broken locally
+                    avatarImg.onerror = function() {
+                        this.style.display = 'none';
+                        avatarContainer.style.backgroundColor = '#8b8b8b';
+                        avatarContainer.style.border = '2px solid #fff';
+                        avatarContainer.style.boxShadow = '2px 2px 0px #000';
+                    };
 
-                    wrapperDiv.appendChild(avatarImg);
+                    avatarContainer.appendChild(avatarImg);
+                    wrapperDiv.appendChild(avatarContainer);
                     wrapperDiv.appendChild(msgDiv);
                 }
 
@@ -191,10 +190,10 @@
 
                     if (!response.ok) throw new Error(`Status: ${response.status}`);
                     const data = await response.json();
-                    appendMessage(data.reply || data.response || "No response received.", 'ai');
+                    appendMessage(data.reply || data.response || "No response data returned.", 'ai');
                 } catch (error) {
                     console.error(error);
-                    appendMessage("[ERROR: PIPELINE OFFLINE]", 'ai');
+                    appendMessage("[SYSTEM ERROR: PIPELINE CONNECTION REFUSED]", 'ai');
                 }
             }
 
@@ -206,11 +205,11 @@
             }
         }
 
-        // Dual-execution setup to guarantee performance regardless of execution environment
+        // Run chat code bindings smoothly
         if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", initApp);
+            document.addEventListener("DOMContentLoaded", initChatEngine);
         } else {
-            initApp();
+            initChatEngine();
         }
     </script>
 </body>
