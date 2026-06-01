@@ -53,7 +53,7 @@
             padding: 14px 22px 10px 26px;
         }
 
-        /* CSS Rendered Theme Placeholder Icon (Matches pixel theme if image fails) */
+        /* CSS Rendered Theme Placeholder Icon */
         .theme-pixel-icon {
             width: 24px;
             height: 24px;
@@ -74,6 +74,16 @@
             background: #4a4a4a;
             border: 2px solid #000;
         }
+
+        /* Retro Thinking Animation: Shifts perfectly by 1 pixel */
+        @keyframes pixelBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); } /* Shifts exactly 1 pixel based on scale */
+        }
+
+        .thinking-sprite {
+            animation: pixelBounce 0.4s steps(2) infinite;
+        }
     </style>
 </head>
 <body>
@@ -89,7 +99,6 @@
     <div id="homeScreen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 80vh; padding: 20px;">
         <h1 style="font-family: 'Press Start 2P', monospace; font-size: 26px; line-height: 1.6; margin-bottom: 24px; color: #ffffff; max-width: 700px;">The Next Gen AI Workspace</h1>
         <p style="font-size: 18px; color: #8b8b8b; max-width: 600px; margin-bottom: 40px; line-height: 1.6; font-weight: bold;">Access advanced pipeline mechanics, interactive modules, and customized AI computing interfaces.</p>
-        
         <button id="startChatBtn" class="pixel-btn" onclick="document.getElementById('homeScreen').style.display='none'; document.getElementById('chatDashboardZone').style.display='block';">Start Chatting</button>
     </div>
 
@@ -117,7 +126,7 @@
             const chatInput = document.getElementById('chatInput');
 
             function appendMessage(text, sender) {
-                if (!chatMessages) return;
+                if (!chatMessages) return null;
 
                 const wrapperDiv = document.createElement('div');
                 wrapperDiv.style.display = "flex";
@@ -143,11 +152,15 @@
                     msgDiv.style.color = "#dbdbdb";
                     msgDiv.style.boxShadow = "inset -3px -3px 0px 0px #111111";
 
-                    // Side Avatar Layout Config
                     const avatarContainer = document.createElement('div');
                     avatarContainer.style.width = "32px";
                     avatarContainer.style.height = "32px";
                     avatarContainer.style.flexShrink = "0";
+
+                    // Attaches animation class if sender tells it to think
+                    if (sender === 'thinking') {
+                        avatarContainer.classList.add('thinking-sprite');
+                    }
 
                     const avatarImg = document.createElement('img');
                     avatarImg.src = "assets/ai-sprite.png";
@@ -156,7 +169,6 @@
                     avatarImg.style.height = "100%";
                     avatarImg.style.objectFit = "contain";
                     
-                    // Uses a themed gray block if image path is broken locally
                     avatarImg.onerror = function() {
                         this.style.display = 'none';
                         avatarContainer.style.backgroundColor = '#8b8b8b';
@@ -172,6 +184,8 @@
                 msgDiv.textContent = text;
                 chatMessages.appendChild(wrapperDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                return wrapperDiv; // Return element so we can delete it later
             }
 
             async function sendMessage() {
@@ -181,6 +195,9 @@
                 appendMessage(messageText, 'user');
                 chatInput.value = '';
 
+                // 1. Create a bouncing "Thinking..." placeholder
+                const thinkingBubble = appendMessage(". . .", 'thinking');
+
                 try {
                     const response = await fetch(`${BACKEND_SERVER_URL}/chat`, {
                         method: 'POST',
@@ -188,11 +205,17 @@
                         body: JSON.stringify({ message: messageText })
                     });
 
+                    // 2. Remove the bouncing thinking block once data is back
+                    if (thinkingBubble) thinkingBubble.remove();
+
                     if (!response.ok) throw new Error(`Status: ${response.status}`);
                     const data = await response.json();
+                    
+                    // 3. Print the real message cleanly
                     appendMessage(data.reply || data.response || "No response data returned.", 'ai');
                 } catch (error) {
                     console.error(error);
+                    if (thinkingBubble) thinkingBubble.remove();
                     appendMessage("[SYSTEM ERROR: PIPELINE CONNECTION REFUSED]", 'ai');
                 }
             }
@@ -205,7 +228,6 @@
             }
         }
 
-        // Run chat code bindings smoothly
         if (document.readyState === "loading") {
             document.addEventListener("DOMContentLoaded", initChatEngine);
         } else {
