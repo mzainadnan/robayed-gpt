@@ -4,7 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robayed GPT</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Base scrollbar styling for the chat box */
+        #chatMessages::-webkit-scrollbar {
+            width: 6px;
+        }
+        #chatMessages::-webkit-scrollbar-thumb {
+            background-color: #2d2d2d;
+            border-radius: 3px;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+    </style>
     
     <link rel="icon" type="image/png" href="assets/ai-sprite.png">
 </head>
@@ -17,118 +30,121 @@
         </div>
     </header>
 
-    <div id="homeScreen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 80vh; padding: 20px;">
+    <div id="homeScreen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 80vh; padding: 20px; box-sizing: border-box;">
         <h1 style="font-size: 48px; margin-bottom: 20px; font-weight: 800; letter-spacing: -1px;">The Next Generation AI Workspace</h1>
         <p style="font-size: 18px; color: #aaa; max-width: 600px; margin-bottom: 40px; line-height: 1.6;">Access advanced pipeline mechanics, interactive modules, and customized AI computing interfaces.</p>
-        <button id="startChatBtn" style="background: #007acc; color: white; border: none; padding: 16px 36px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 14px rgba(0,122,204,0.4);">Start Chatting →</button>
+        <button id="startChatBtn" style="background: #007acc; color: white; border: none; padding: 16px 36px; font-size: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 14px rgba(0,122,204,0.4); transition: transform 0.1s ease;">Start Chatting →</button>
     </div>
 
     <div id="chatDashboardZone" style="display: none; max-width: 800px; margin: 30px auto; padding: 20px; box-sizing: border-box;">
         <main style="background: #1a1a1a; border: 1px solid #2d2d2d; border-radius: 12px; height: 55vh; display: flex; flex-direction: column;">
             <div id="chatMessages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;">
-                <div style="background: rgba(0,122,204,0.1); border: 1px solid rgba(0,122,204,0.2); padding: 12px; border-radius: 8px; color: #007acc; font-size: 14px; text-align: center;">
+                <div style="background: rgba(0,122,204,0.1); border: 1px solid rgba(0,122,204,0.2); padding: 12px; border-radius: 8px; color: #007acc; font-size: 14px; text-align: center; flex-shrink: 0;">
                     AI Session Initialized. Free Access Active.
                 </div>
             </div>
         </main>
 
         <footer style="margin-top: 20px; display: flex; gap: 12px;">
-            <input type="text" id="chatInput" placeholder="Type your message here..." style="flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 15px;" />
-            <button id="sendBtn" style="padding: 0 30px; border-radius: 8px; background: #007acc; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 15px;">Send</button>
+            <input type="text" id="chatInput" placeholder="Type your message here..." style="flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 15px; outline: none;" />
+            <button id="sendBtn" style="padding: 0 30px; border-radius: 8px; background: #007acc; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 15px; transition: transform 0.1s ease;">Send</button>
         </footer>
     </div>
 
     <script>
         const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
 
-        // Interface Elements
-        const homeScreen = document.getElementById('homeScreen');
-        const chatDashboardZone = document.getElementById('chatDashboardZone');
-        const startChatBtn = document.getElementById('startChatBtn');
-        const sendBtn = document.getElementById('sendBtn');
-        const chatMessages = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
+        // DOMContentLoaded guarantees the elements exist in the window before JS touches them
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // Interface Element Selection
+            const homeScreen = document.getElementById('homeScreen');
+            const chatDashboardZone = document.getElementById('chatDashboardZone');
+            const startChatBtn = document.getElementById('startChatBtn');
+            const sendBtn = document.getElementById('sendBtn');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
 
-        // SCREEN TRANSITION LOGIC
-        if (startChatBtn) {
-            startChatBtn.addEventListener('click', function() {
-                if (homeScreen) homeScreen.style.display = 'none';
-                if (chatDashboardZone) chatDashboardZone.style.display = 'block';
-            });
-        }
-
-        // RENDER MESSAGE IN WINDOW
-        function appendMessage(text, sender) {
-            if (!chatMessages) return;
-
-            // Wrapper container for layout alignment
-            const wrapperDiv = document.createElement('div');
-            wrapperDiv.style.display = "flex";
-            wrapperDiv.style.gap = "10px";
-            wrapperDiv.style.alignItems = "flex-start";
-            wrapperDiv.style.maxWidth = "75%";
-
-            // Message Bubble Element
-            const msgDiv = document.createElement('div');
-            msgDiv.style.padding = "10px 14px";
-            msgDiv.style.borderRadius = "8px";
-            msgDiv.style.fontSize = "15px";
-            msgDiv.style.lineHeight = "1.5";
-
-            if (sender === 'user') {
-                wrapperDiv.style.alignSelf = "flex-end";
-                msgDiv.style.background = "#007acc";
-                msgDiv.style.color = "white";
-                
-                wrapperDiv.appendChild(msgDiv);
-            } else {
-                wrapperDiv.style.alignSelf = "flex-start";
-                msgDiv.style.background = "#252525";
-                msgDiv.style.color = "#fff";
-                msgDiv.style.border = "1px solid #333";
-
-                // AI avatar image element
-                const avatarImg = document.createElement('img');
-                avatarImg.src = "assets/ai-sprite.png";
-                avatarImg.alt = "AI";
-                avatarImg.style.width = "28px";
-                avatarImg.style.height = "28px";
-                avatarImg.style.objectFit = "contain";
-                avatarImg.style.borderRadius = "50%";
-                avatarImg.style.flexShrink = "0";
-
-                wrapperDiv.appendChild(avatarImg);
-                wrapperDiv.appendChild(msgDiv);
+            // SCREEN TRANSITION LOGIC
+            if (startChatBtn) {
+                startChatBtn.addEventListener('click', function() {
+                    if (homeScreen) homeScreen.style.display = 'none';
+                    if (chatDashboardZone) chatDashboardZone.style.display = 'block';
+                });
             }
 
-            msgDiv.textContent = text;
-            chatMessages.appendChild(wrapperDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+            // RENDER MESSAGE IN WINDOW
+            function appendMessage(text, sender) {
+                if (!chatMessages) return;
 
-        // SEND MESSAGE ROUTINE
-        async function sendMessage() {
-            const messageText = chatInput.value.trim();
-            if (!messageText) return;
-            
-            appendMessage(messageText, 'user');
-            chatInput.value = '';
+                // Layout container row
+                const wrapperDiv = document.createElement('div');
+                wrapperDiv.style.display = "flex";
+                wrapperDiv.style.gap = "10px";
+                wrapperDiv.style.alignItems = "flex-start";
+                wrapperDiv.style.maxWidth = "75%";
 
-            // Simulated response logic for verification
-            setTimeout(() => {
-                appendMessage("This is a response showing the new layout with the asset icon next to it!", 'ai');
-            }, 750);
-        }
+                // Chat bubble container
+                const msgDiv = document.createElement('div');
+                msgDiv.style.padding = "10px 14px";
+                msgDiv.style.borderRadius = "8px";
+                msgDiv.style.fontSize = "15px";
+                msgDiv.style.lineHeight = "1.5";
 
-        // Event Listeners for sending messages
-        if (sendBtn) {
-            sendBtn.addEventListener('click', sendMessage);
-        }
-        if (chatInput) {
-            chatInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') sendMessage();
-            });
-        }
+                if (sender === 'user') {
+                    wrapperDiv.style.alignSelf = "flex-end";
+                    msgDiv.style.background = "#007acc";
+                    msgDiv.style.color = "white";
+                    wrapperDiv.appendChild(msgDiv);
+                } else {
+                    wrapperDiv.style.alignSelf = "flex-start";
+                    msgDiv.style.background = "#252525";
+                    msgDiv.style.color = "#fff";
+                    msgDiv.style.border = "1px solid #333";
+
+                    // Side avatar configuration
+                    const avatarImg = document.createElement('img');
+                    avatarImg.src = "assets/ai-sprite.png";
+                    avatarImg.alt = "AI";
+                    avatarImg.style.width = "28px";
+                    avatarImg.style.height = "28px";
+                    avatarImg.style.objectFit = "contain";
+                    avatarImg.style.borderRadius = "50%";
+                    avatarImg.style.flexShrink = "0";
+
+                    wrapperDiv.appendChild(avatarImg);
+                    wrapperDiv.appendChild(msgDiv);
+                }
+
+                msgDiv.textContent = text;
+                chatMessages.appendChild(wrapperDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // SEND MESSAGE ROUTINE
+            async function sendMessage() {
+                const messageText = chatInput.value.trim();
+                if (!messageText) return;
+                
+                appendMessage(messageText, 'user');
+                chatInput.value = '';
+
+                // Automated reply layout simulator
+                setTimeout(() => {
+                    appendMessage("Connected successfully! Your sprite asset is fixed and perfectly aligned.", 'ai');
+                }, 600);
+            }
+
+            // Secure action links
+            if (sendBtn) {
+                sendBtn.addEventListener('click', sendMessage);
+            }
+            if (chatInput) {
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') sendMessage();
+                });
+            }
+        });
     </script>
 </body>
 </html>
