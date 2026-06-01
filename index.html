@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robayed GPT</title>
     <link rel="stylesheet" href="style.css">
-    
     <link rel="icon" type="image/png" href="assets/ai-sprite.png">
 </head>
 <body style="margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white;">
 
     <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #1a1a1a; border-bottom: 1px solid #2d2d2d;">
         <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 20px;">
-            <span style="color: #007acc;">●</span> Robayed GPT
+            <img src="assets/ai-sprite.png" alt="AI Icon" style="width: 24px; height: 24px; object-fit: contain; border-radius: 50%;">
+            Robayed GPT
         </div>
     </header>
 
@@ -48,7 +48,7 @@
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
 
-        // SCREEN TRANSITION LOGIC
+        // Screen Transition Logic
         if (startChatBtn) {
             startChatBtn.addEventListener('click', function() {
                 if (homeScreen) homeScreen.style.display = 'none';
@@ -56,7 +56,7 @@
             });
         }
 
-        // RENDER MESSAGE IN WINDOW
+        // Render Message in Window
         function appendMessage(text, sender) {
             if (!chatMessages) return;
             const msgDiv = document.createElement('div');
@@ -71,18 +71,3 @@
                 msgDiv.style.background = "#007acc";
                 msgDiv.style.color = "white";
             } else {
-                msgDiv.style.alignSelf = "flex-start";
-                msgDiv.style.background = "#252525";
-                msgDiv.style.color = "#fff";
-                msgDiv.style.border = "1px solid #333";
-            }
-
-            msgDiv.textContent = text;
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // SEND MESSAGE ROUTINE
-        async function sendMessage() {
-            const messageText = chatInput.value.trim();
-            if (!messageText) return;
