@@ -46,4 +46,128 @@
         </main>
 
         <footer style="margin-top: 20px; display: flex; gap: 12px;">
-            <input type="text" id="chatInput" placeholder="Type your message here..." style="flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 15px
+            <input type="text" id="chatInput" placeholder="Type your message here..." style="flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 15px; outline: none;" />
+            <button id="sendBtn" style="padding: 0 30px; border-radius: 8px; background: #007acc; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 15px; transition: transform 0.1s ease;">Send</button>
+        </footer>
+    </div>
+
+    <script>
+        const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
+
+        // Guarantees all HTML elements load safely before executing scripts
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // UI Element References
+            const homeScreen = document.getElementById('homeScreen');
+            const chatDashboardZone = document.getElementById('chatDashboardZone');
+            const startChatBtn = document.getElementById('startChatBtn');
+            const sendBtn = document.getElementById('sendBtn');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
+
+            // Screen Transition Routing
+            if (startChatBtn) {
+                startChatBtn.addEventListener('click', function() {
+                    if (homeScreen) homeScreen.style.display = 'none';
+                    if (chatDashboardZone) chatDashboardZone.style.display = 'block';
+                });
+            }
+
+            // Message Element Constructor
+            function appendMessage(text, sender) {
+                if (!chatMessages) return;
+
+                // Create flex container row for structural layout
+                const wrapperDiv = document.createElement('div');
+                wrapperDiv.style.display = "flex";
+                wrapperDiv.style.gap = "10px";
+                wrapperDiv.style.alignItems = "flex-start";
+                wrapperDiv.style.maxWidth = "75%";
+
+                // Message text container bubble
+                const msgDiv = document.createElement('div');
+                msgDiv.style.padding = "10px 14px";
+                msgDiv.style.borderRadius = "8px";
+                msgDiv.style.fontSize = "15px";
+                msgDiv.style.lineHeight = "1.5";
+
+                if (sender === 'user') {
+                    wrapperDiv.style.alignSelf = "flex-end";
+                    msgDiv.style.background = "#007acc";
+                    msgDiv.style.color = "white";
+                    wrapperDiv.appendChild(msgDiv);
+                } else {
+                    wrapperDiv.style.alignSelf = "flex-start";
+                    msgDiv.style.background = "#252525";
+                    msgDiv.style.color = "#fff";
+                    msgDiv.style.border = "1px solid #333";
+
+                    // Side-by-side Avatar configuration 
+                    const avatarImg = document.createElement('img');
+                    avatarImg.src = "assets/ai-sprite.png";
+                    avatarImg.alt = "AI";
+                    avatarImg.style.width = "28px";
+                    avatarImg.style.height = "28px";
+                    avatarImg.style.objectFit = "contain";
+                    avatarImg.style.borderRadius = "50%";
+                    avatarImg.style.flexShrink = "0";
+
+                    // Append sprite image first, text window next to it
+                    wrapperDiv.appendChild(avatarImg);
+                    wrapperDiv.appendChild(msgDiv);
+                }
+
+                msgDiv.textContent = text;
+                chatMessages.appendChild(wrapperDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // Live API Communication Sequence
+            async function sendMessage() {
+                const messageText = chatInput.value.trim();
+                if (!messageText) return;
+                
+                // Display user box instantly
+                appendMessage(messageText, 'user');
+                chatInput.value = '';
+
+                try {
+                    // Send message array to Render Node/Python server
+                    // Assumes a processing endpoint setup at /chat
+                    const response = await fetch(`${BACKEND_SERVER_URL}/chat`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message: messageText })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Server status returned error code: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    // Maps backend text variants dynamically
+                    const aiReply = data.reply || data.response || "No structured text content returned from the pipeline server.";
+                    appendMessage(aiReply, 'ai');
+
+                } catch (error) {
+                    console.error("Pipeline breakdown:", error);
+                    appendMessage("System Error: Connection to backend node refused. Please check server logs.", 'ai');
+                }
+            }
+
+            // Bind Interface Listeners
+            if (sendBtn) {
+                sendBtn.addEventListener('click', sendMessage);
+            }
+            if (chatInput) {
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') sendMessage();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
