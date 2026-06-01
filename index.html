@@ -6,7 +6,7 @@
     <title>Robayed GPT</title>
     
     <style>
-        /* Base scrollbar styling for the chat box */
+        /* Base scrollbar styling for the chat container */
         #chatMessages::-webkit-scrollbar {
             width: 6px;
         }
@@ -46,105 +46,4 @@
         </main>
 
         <footer style="margin-top: 20px; display: flex; gap: 12px;">
-            <input type="text" id="chatInput" placeholder="Type your message here..." style="flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 15px; outline: none;" />
-            <button id="sendBtn" style="padding: 0 30px; border-radius: 8px; background: #007acc; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 15px; transition: transform 0.1s ease;">Send</button>
-        </footer>
-    </div>
-
-    <script>
-        const BACKEND_SERVER_URL = 'https://robayed-gpt-backend.onrender.com';
-
-        // DOMContentLoaded guarantees the elements exist in the window before JS touches them
-        document.addEventListener("DOMContentLoaded", function() {
-            
-            // Interface Element Selection
-            const homeScreen = document.getElementById('homeScreen');
-            const chatDashboardZone = document.getElementById('chatDashboardZone');
-            const startChatBtn = document.getElementById('startChatBtn');
-            const sendBtn = document.getElementById('sendBtn');
-            const chatMessages = document.getElementById('chatMessages');
-            const chatInput = document.getElementById('chatInput');
-
-            // SCREEN TRANSITION LOGIC
-            if (startChatBtn) {
-                startChatBtn.addEventListener('click', function() {
-                    if (homeScreen) homeScreen.style.display = 'none';
-                    if (chatDashboardZone) chatDashboardZone.style.display = 'block';
-                });
-            }
-
-            // RENDER MESSAGE IN WINDOW
-            function appendMessage(text, sender) {
-                if (!chatMessages) return;
-
-                // Layout container row
-                const wrapperDiv = document.createElement('div');
-                wrapperDiv.style.display = "flex";
-                wrapperDiv.style.gap = "10px";
-                wrapperDiv.style.alignItems = "flex-start";
-                wrapperDiv.style.maxWidth = "75%";
-
-                // Chat bubble container
-                const msgDiv = document.createElement('div');
-                msgDiv.style.padding = "10px 14px";
-                msgDiv.style.borderRadius = "8px";
-                msgDiv.style.fontSize = "15px";
-                msgDiv.style.lineHeight = "1.5";
-
-                if (sender === 'user') {
-                    wrapperDiv.style.alignSelf = "flex-end";
-                    msgDiv.style.background = "#007acc";
-                    msgDiv.style.color = "white";
-                    wrapperDiv.appendChild(msgDiv);
-                } else {
-                    wrapperDiv.style.alignSelf = "flex-start";
-                    msgDiv.style.background = "#252525";
-                    msgDiv.style.color = "#fff";
-                    msgDiv.style.border = "1px solid #333";
-
-                    // Side avatar configuration
-                    const avatarImg = document.createElement('img');
-                    avatarImg.src = "assets/ai-sprite.png";
-                    avatarImg.alt = "AI";
-                    avatarImg.style.width = "28px";
-                    avatarImg.style.height = "28px";
-                    avatarImg.style.objectFit = "contain";
-                    avatarImg.style.borderRadius = "50%";
-                    avatarImg.style.flexShrink = "0";
-
-                    wrapperDiv.appendChild(avatarImg);
-                    wrapperDiv.appendChild(msgDiv);
-                }
-
-                msgDiv.textContent = text;
-                chatMessages.appendChild(wrapperDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            // SEND MESSAGE ROUTINE
-            async function sendMessage() {
-                const messageText = chatInput.value.trim();
-                if (!messageText) return;
-                
-                appendMessage(messageText, 'user');
-                chatInput.value = '';
-
-                // Automated reply layout simulator
-                setTimeout(() => {
-                    appendMessage("Connected successfully! Your sprite asset is fixed and perfectly aligned.", 'ai');
-                }, 600);
-            }
-
-            // Secure action links
-            if (sendBtn) {
-                sendBtn.addEventListener('click', sendMessage);
-            }
-            if (chatInput) {
-                chatInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') sendMessage();
-                });
-            }
-        });
-    </script>
-</body>
-</html>
+            <input type="text" id="chatInput" placeholder="Type your message here..." style="flex: 1; padding: 16px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; font-size: 15px
