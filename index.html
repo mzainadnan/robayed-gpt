@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robayed GPT</title>
     <link rel="stylesheet" href="style.css">
+    
+    <link rel="icon" type="image/png" href="assets/ai-sprite.png">
 </head>
 <body style="margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white;">
 
     <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #1a1a1a; border-bottom: 1px solid #2d2d2d;">
         <div style="display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 20px;">
-            <img src="assets/ai-sprite.png" alt="AI Icon" style="width: 24px; height: 24px; object-fit: contain; border-radius: 50%;">
+            <img src="assets/ai-sprite.png" alt="AI Icon" style="width: 24px; height: 24px; object-fit: contain;">
             Robayed GPT
         </div>
     </header>
@@ -47,7 +49,7 @@
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
 
-        // Screen Transition Logic
+        // SCREEN TRANSITION LOGIC
         if (startChatBtn) {
             startChatBtn.addEventListener('click', function() {
                 if (homeScreen) homeScreen.style.display = 'none';
@@ -55,18 +57,79 @@
             });
         }
 
-        // Render Message in Window
+        // RENDER MESSAGE IN WINDOW
         function appendMessage(text, sender) {
             if (!chatMessages) return;
+
+            // Wrapper container for layout alignment
+            const wrapperDiv = document.createElement('div');
+            wrapperDiv.style.display = "flex";
+            wrapperDiv.style.gap = "10px";
+            wrapperDiv.style.alignItems = "flex-start";
+            wrapperDiv.style.maxWidth = "75%";
+
+            // Message Bubble Element
             const msgDiv = document.createElement('div');
             msgDiv.style.padding = "10px 14px";
             msgDiv.style.borderRadius = "8px";
-            msgDiv.style.maxWidth = "75%";
             msgDiv.style.fontSize = "15px";
             msgDiv.style.lineHeight = "1.5";
 
             if (sender === 'user') {
-                msgDiv.style.alignSelf = "flex-end";
+                wrapperDiv.style.alignSelf = "flex-end";
                 msgDiv.style.background = "#007acc";
                 msgDiv.style.color = "white";
+                
+                // Just add the bubble for the user
+                wrapperDiv.appendChild(msgDiv);
             } else {
+                wrapperDiv.style.alignSelf = "flex-start";
+                msgDiv.style.background = "#252525";
+                msgDiv.style.color = "#fff";
+                msgDiv.style.border = "1px solid #333";
+
+                // Create AI avatar image element
+                const avatarImg = document.createElement('img');
+                avatarImg.src = "assets/ai-sprite.png";
+                avatarImg.alt = "AI";
+                avatarImg.style.width = "28px";
+                avatarImg.style.height = "28px";
+                avatarImg.style.objectFit = "contain";
+                avatarImg.style.borderRadius = "50%";
+                avatarImg.style.flexShrink = "0";
+
+                // Append avatar first, then the message box next to it
+                wrapperDiv.appendChild(avatarImg);
+                wrapperDiv.appendChild(msgDiv);
+            }
+
+            msgDiv.textContent = text;
+            chatMessages.appendChild(wrapperDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // SEND MESSAGE ROUTINE
+        async function sendMessage() {
+            const messageText = chatInput.value.trim();
+            if (!messageText) return;
+            
+            appendMessage(messageText, 'user');
+            chatInput.value = '';
+
+            // Simulated AI Response testing logic (Replace with your direct Render API call)
+            setTimeout(() => {
+                appendMessage("This is a response showing the new layout with the asset icon next to it!", 'ai');
+            }, 750);
+        }
+
+        if (sendBtn) {
+            sendBtn.addEventListener('click', sendMessage);
+        }
+        if (chatInput) {
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendMessage();
+            });
+        }
+    </script>
+</body>
+</html>
