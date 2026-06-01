@@ -53,6 +53,24 @@
             padding: 14px 22px 10px 26px;
         }
 
+        /* Small Copy Action Trigger Button */
+        .pixel-copy-btn {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
+            background: #4a4a4a;
+            color: #fff;
+            border: 2px solid #000;
+            cursor: pointer;
+            padding: 4px 6px;
+            margin-top: 8px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+        
+        .pixel-copy-btn:active {
+            background: #262626;
+        }
+
         /* CSS Rendered Theme Placeholder Icon */
         .theme-pixel-icon {
             width: 24px;
@@ -78,7 +96,7 @@
         /* Retro Thinking Animation: Shifts perfectly by 1 pixel */
         @keyframes pixelBounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-2px); } /* Shifts exactly 1 pixel based on scale */
+            50% { transform: translateY(-2px); }
         }
 
         .thinking-sprite {
@@ -125,8 +143,18 @@
             const chatMessages = document.getElementById('chatMessages');
             const chatInput = document.getElementById('chatInput');
 
-            function appendMessage(text, sender) {
+            // Helper function to clean markdown formatting symbols like *
+            function cleanMarkdown(text) {
+                if (!text) return "";
+                // Removes individual standalone or grouped asterisk formatting marks completely
+                return text.replace(/\*/g, '');
+            }
+
+            function appendMessage(rawText, sender) {
                 if (!chatMessages) return null;
+
+                // Strip star formatting out of the raw response text string
+                const text = cleanMarkdown(rawText);
 
                 const wrapperDiv = document.createElement('div');
                 wrapperDiv.style.display = "flex";
@@ -134,18 +162,25 @@
                 wrapperDiv.style.alignItems = "flex-start";
                 wrapperDiv.style.maxWidth = "85%";
 
+                // Main vertical block container for the bubble and its inner tools
+                const blockContainer = document.createElement('div');
+                blockContainer.style.display = "flex";
+                blockContainer.style.flexDirection = "column";
+
                 const msgDiv = document.createElement('div');
                 msgDiv.style.padding = "12px 16px";
                 msgDiv.style.fontSize = "16px";
                 msgDiv.style.lineHeight = "1.4";
                 msgDiv.style.border = "4px solid #000000";
+                msgDiv.textContent = text;
 
                 if (sender === 'user') {
                     wrapperDiv.style.alignSelf = "flex-end";
                     msgDiv.style.background = "#5a5a5a";
                     msgDiv.style.color = "#ffffff";
                     msgDiv.style.boxShadow = "inset -3px -3px 0px 0px #333333";
-                    wrapperDiv.appendChild(msgDiv);
+                    blockContainer.appendChild(msgDiv);
+                    wrapperDiv.appendChild(blockContainer);
                 } else {
                     wrapperDiv.style.alignSelf = "flex-start";
                     msgDiv.style.background = "#2b2b2b";
@@ -157,7 +192,6 @@
                     avatarContainer.style.height = "32px";
                     avatarContainer.style.flexShrink = "0";
 
-                    // Attaches animation class if sender tells it to think
                     if (sender === 'thinking') {
                         avatarContainer.classList.add('thinking-sprite');
                     }
@@ -178,14 +212,34 @@
 
                     avatarContainer.appendChild(avatarImg);
                     wrapperDiv.appendChild(avatarContainer);
-                    wrapperDiv.appendChild(msgDiv);
+                    
+                    blockContainer.appendChild(msgDiv);
+
+                    // Append interactive copy tool only for active system replies
+                    if (sender === 'ai') {
+                        const copyBtn = document.createElement('button');
+                        copyBtn.className = 'pixel-copy-btn';
+                        copyBtn.textContent = '[Copy]';
+                        copyBtn.onclick = function() {
+                            navigator.clipboard.writeText(text).then(() => {
+                                copyBtn.textContent = '[Copied!]';
+                                setTimeout(() => {
+                                    copyBtn.textContent = '[Copy]';
+                                }, 1500);
+                            }).catch(err => {
+                                console.error('Copy function failed:', err);
+                            });
+                        };
+                        blockContainer.appendChild(copyBtn);
+                    }
+
+                    wrapperDiv.appendChild(blockContainer);
                 }
 
-                msgDiv.textContent = text;
                 chatMessages.appendChild(wrapperDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
 
-                return wrapperDiv; // Return element so we can delete it later
+                return wrapperDiv;
             }
 
             async function sendMessage() {
@@ -195,7 +249,6 @@
                 appendMessage(messageText, 'user');
                 chatInput.value = '';
 
-                // 1. Create a bouncing "Thinking..." placeholder
                 const thinkingBubble = appendMessage(". . .", 'thinking');
 
                 try {
@@ -205,14 +258,13 @@
                         body: JSON.stringify({ message: messageText })
                     });
 
-                    // 2. Remove the bouncing thinking block once data is back
                     if (thinkingBubble) thinkingBubble.remove();
 
                     if (!response.ok) throw new Error(`Status: ${response.status}`);
                     const data = await response.json();
                     
-                    // 3. Print the real message cleanly
-                    appendMessage(data.reply || data.response || "No response data returned.", 'ai');
+                    const responseText = data.reply || data.response || "No response data returned.";
+                    appendMessage(responseText, 'ai');
                 } catch (error) {
                     console.error(error);
                     if (thinkingBubble) thinkingBubble.remove();
